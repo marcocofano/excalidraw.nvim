@@ -58,9 +58,12 @@ end
 ---Construct the absolute path to the file.
 ---@param link string The link to construct the path for.
 ---@return string The constructed absolute path.
-local construct_path     = function(link)
+function PathHandler:construct_path(link)
    -- Construct the absolute path to the file
-   return vim.fn.expand('%:p:h') .. '/' .. link
+   if string.match(link, "^/") then
+      return link
+   end
+   return M.path_handler.storage_dir .. '/' .. link
 end
 
 M.open_excalidraw_file   = function()
@@ -101,7 +104,7 @@ M.create_excalidraw_file = function()
    end
 
    -- Append the .excalidraw extension
-   local filepath = construct_path(filename .. ".excalidraw")
+   local filepath = M.path_handler:construct_path(filename .. ".excalidraw")
 
    -- Check if the file already exists
    if vim.fn.filereadable(filepath) == 1 then
@@ -118,7 +121,7 @@ M.create_excalidraw_file = function()
   "elements": [],
   "appState": {
     "gridSize": null,
-    "viewBackgroundColor": "#ffffff"
+    "viewBackgroundColor": "#afffff"
   },
   "files": {}
 }
@@ -140,7 +143,14 @@ M.create_excalidraw_file = function()
    vim.api.nvim_put({ markdown_link }, 'l', true, true)
 end
 
-
+---@param dir string The directory path to ensure exists.
+local function ensure_directory_exists(dir)
+   if vim.fn.isdirectory(dir) == 0 then
+      -- Create the directory with 'p' flag to make parent directories if needed
+      vim.fn.mkdir(dir, "p")
+      vim.notify("Created storage directory: " .. dir)
+   end
+end
 
 ---@type PathHandler|nil
 M.path_handler = nil
@@ -150,6 +160,7 @@ M.path_handler = nil
 M.setup = function(opts)
    local storage_dir = opts.storage_dir or vim.fn.expand("~/.excalidraw")
    M.path_handler = PathHandler.new(storage_dir)
+   ensure_directory_exists(storage_dir)
    vim.notify("Excalidraw plugin configured with storage directory: " .. storage_dir)
 end
 
