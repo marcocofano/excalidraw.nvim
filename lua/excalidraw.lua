@@ -30,6 +30,7 @@ M.open_excalidraw_file   = function()
 end
 
 M.create_excalidraw_file = function()
+   local config   = require("excalidraw.config").get()
    -- Prompt the user for the file name
    local filename = vim.fn.input("Enter the name of the new Excalidraw file (without extension): ")
 
@@ -42,7 +43,6 @@ M.create_excalidraw_file = function()
    -- Append the .excalidraw extension
    local filepath = path_handler.construct_path(filename .. ".excalidraw")
    local expanded_filepath = vim.fn.fnamemodify(filepath, ":p")
-   print(vim.inspect(expanded_filepath))
    -- Check if the file already exists
    if vim.fn.filereadable(expanded_filepath) == 1 then
       vim.notify("File already exists: " .. expanded_filepath, vim.log.levels.ERROR)
@@ -78,6 +78,11 @@ M.create_excalidraw_file = function()
    -- Insert a Markdown link to the new file at the current cursor position
    local markdown_link = "[" .. filename .. "](" .. expanded_filepath .. ")"
    vim.api.nvim_put({ markdown_link }, 'l', true, true)
+   -- Open the newly created file
+   if config.open_on_create == true then
+      vim.fn.searchpos("]", "e")
+      M.open_excalidraw_file()
+   end
 end
 
 ---@param dir string The directory path to ensure exists.
@@ -90,9 +95,9 @@ local function ensure_directory_exists(dir)
 end
 
 
----@param config table Configuration options.
-M.configure = function(config)
-   require('excalidraw.config').set(config)
+---@param configuration table Configuration options.
+M.configure = function(configuration)
+   require('excalidraw.config').set(configuration)
 end
 
 return M

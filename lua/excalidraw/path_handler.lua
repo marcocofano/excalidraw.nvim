@@ -1,4 +1,3 @@
-local config = require("excalidraw.config").get()
 
 M = {}
 
@@ -11,6 +10,7 @@ M = {}
 ---@param link string The link or file path to resolve.
 ---@return string | nil The resolved absolute file path, or nil if the path cannot be resolved
 M.resolve_path = function(link)
+   local config = require("excalidraw.config").get()
    if string.match(link, "^/") then
       if vim.fn.filereadable(link) == 1 then
          return link
@@ -47,6 +47,7 @@ end
 ---@param link string The link to construct the path for.
 ---@return string The constructed absolute path.
 M.construct_path = function(link)
+   local config = require("excalidraw.config").get()
    -- Construct the absolute path to the file
    if string.match(link, "^/") then
       return link
