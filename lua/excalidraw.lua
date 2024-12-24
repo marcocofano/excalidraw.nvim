@@ -41,10 +41,11 @@ M.create_excalidraw_file = function()
 
    -- Append the .excalidraw extension
    local filepath = path_handler.construct_path(filename .. ".excalidraw")
-   print(P(filepath))
+   local expanded_filepath = vim.fn.fnamemodify(filepath, ":p")
+   print(vim.inspect(expanded_filepath))
    -- Check if the file already exists
-   if vim.fn.filereadable(filepath) == 1 then
-      vim.notify("File already exists: " .. filepath, vim.log.levels.ERROR)
+   if vim.fn.filereadable(expanded_filepath) == 1 then
+      vim.notify("File already exists: " .. expanded_filepath, vim.log.levels.ERROR)
       return
    end
 
@@ -64,18 +65,18 @@ M.create_excalidraw_file = function()
 ]]
 
    -- Write the default content to the new file
-   local file = io.open(filepath, "w")
+   local file = io.open(expanded_filepath, "w")
    if file then
       file:write(default_content)
       file:close()
-      vim.notify("Created new Excalidraw file: " .. filepath)
+      vim.notify("Created new Excalidraw file: " .. expanded_filepath)
    else
-      vim.notify("Error creating file: " .. filepath, vim.log.levels.ERROR)
+      vim.notify("Error creating file: " .. expanded_filepath, vim.log.levels.ERROR)
       return
    end
 
    -- Insert a Markdown link to the new file at the current cursor position
-   local markdown_link = "[" .. filename .. "](" .. filepath .. ")"
+   local markdown_link = "[" .. filename .. "](" .. expanded_filepath .. ")"
    vim.api.nvim_put({ markdown_link }, 'l', true, true)
 end
 
