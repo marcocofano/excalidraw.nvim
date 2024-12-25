@@ -1,4 +1,4 @@
-
+local utils = require "excalidraw.utils"
 M = {}
 
 ---Resolve and find path based on the link, handling relative, absolute paths
@@ -28,14 +28,14 @@ M.resolve_path = function(link)
 
    -- 3. CWD/.excalidraw -- TODO: Missing case only with cwd and not .excalidraw done
    local cwd = vim.fn.fnamemodify(vim.fn.getcwd(), ":p")
-   local relative_path = cwd .. '/' .. link
+   relative_path = cwd .. '/' .. link
    if vim.fn.filereadable(relative_path) == 1 then
       return relative_path
    end
 
    -- 4. Current file directory
    local current_dir = vim.fn.expand("%:p:h")
-   local relative_path = current_dir .. '/' .. link
+   relative_path = current_dir .. '/' .. link
    if vim.fn.filereadable(relative_path) == 1 then
       return relative_path
    end
@@ -44,15 +44,28 @@ M.resolve_path = function(link)
 end
 
 ---Construct the absolute path to the file.
----@param link string The link to construct the path for.
----@return string The constructed absolute path.
-M.construct_path = function(link)
-   local config = require("excalidraw.config").get()
-   -- Construct the absolute path to the file
-   if string.match(link, "^/") then
-      return link
-   end
-   return config.storage_dir .. '/' .. link
-end
+---@param input string The link to construct the path for.
+---@return string  The constructed absolute path.
+M.construct_path = function(input, storage_dir)
+   if not input then return nil end
 
+   -- 1. Absolute input, return as-is
+   if input:sub(1, 1) == "/" then
+      return input
+   end
+
+   -- 2. Input path starting with "./" or similar, expand relative to CWD
+   if input:sub(1, 2) == "./" then
+      return vim.fn.getcwd() .. "/" .. input:sub(3)
+   end
+
+   -- 3. input starting with "~", expand to home directory
+   if input:sub(1, 1) == "~" then
+      local home = vim.fn.expand("~")
+      return home .. input:sub(2)
+   end
+
+   -- 4. Default case: Expand relative to storage_dir
+   return vim.fn.fnamemodify(storage_dir, ":p") .. "/" .. input
+end
 return M
