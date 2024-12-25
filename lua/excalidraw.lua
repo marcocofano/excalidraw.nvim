@@ -1,16 +1,11 @@
 local path_handler = require("excalidraw.path_handler")
 
+local utils = require("excalidraw.utils")
+
 local M            = {}
 
----@param dir string The directory path to ensure exists.
-local function ensure_directory_exists(dir)
-   if vim.fn.isdirectory(dir) == 0 then
-      -- Create the directory with 'p' flag to make parent directories if needed
-      vim.fn.mkdir(dir, "p")
-      vim.notify("Created storage directory: " .. dir)
-   end
-end
 
+-- Open a excalidraw canva from a markdown link (or just a string with a path to a canva)
 M.open_excalidraw_file   = function()
    -- Get the link or file name under the cursor
    local link = vim.fn.expand('<cfile>')
@@ -38,14 +33,15 @@ M.open_excalidraw_file   = function()
    end
 end
 
---
+-- Create a excalidraw canvas file and a markdown link to it
 -- 1. parse input
 -- 2. expand to absolute
 -- 3. ensure directories exists
 -- 4. save file
--- 5. open it (if configured)
---
+-- 5. create a link (you can configure the style. Absolute or relative)
+-- 6. open it (if configured)
 M.create_excalidraw_file = function()
+   -- 1. parse the input
    local config      = require("excalidraw.config").get()
    -- Prompt the user for the file name
    local input_path  = vim.fn.input("Enter the name of the new Excalidraw file (without extension): ")
@@ -56,18 +52,21 @@ M.create_excalidraw_file = function()
       return
    end
 
+   -- 2. expand to absolute
    local filepath = path_handler.construct_path(input_path .. ".excalidraw", storage_dir)
    --TODO: handle better the difference between displayed relative path and the path where to actually save the file
-   -- Check if the file already exists TODO: handle overwrite
+   -- Check if the file already exists
    if vim.fn.filereadable(filepath) == 1 then
       vim.notify("File already exists: " .. filepath, vim.log.levels.ERROR)
-      return
+      return -- TODO: handle overwrite
    end
 
    local path = vim.fn.fnamemodify(filepath, ":p:h")
-   ensure_directory_exists(path)
+   -- 3. ensure directories to save file exist
+   utils.ensure_directory_exists(path)
 
-   -- Create the new .excalidraw file with a default empty JSON structure
+   -- Create the new .excalidraw file with a default empty JSON structure.
+   -- TODO: handle the default used. For example from templates or a different one from config
    local default_content = [[
 {
   "type": "excalidraw",
@@ -82,7 +81,7 @@ M.create_excalidraw_file = function()
 }
 ]]
 
-   -- Write the default content to the new file
+   -- 4. Write the default content to the new file
    local file = io.open(filepath, "w")
    if file then
       file:write(default_content)
@@ -93,17 +92,16 @@ M.create_excalidraw_file = function()
       return
    end
 
-   -- Insert a Markdown link to the new file at the current cursor position
+   -- 5. Insert a Markdown link to the new file at the current cursor position
    local markdown_link = "[" .. input_path .. "](" .. filepath .. ")"
    vim.api.nvim_put({ markdown_link }, 'l', true, true)
-   -- Open the newly created file
+
+   -- 6. Open the newly created file
    if config.open_on_create == true then
       vim.fn.searchpos("]", "e")
       M.open_excalidraw_file()
    end
 end
-
-
 
 
 ---@param configuration table Configuration options.
