@@ -18,9 +18,15 @@ function M.build_commands()
       end,
       {
          nargs = "+",
-         complete = function()
-            return vim.tbl_keys(M.subcomnands)
-         end
+         complete = function(arg_lead, _, _)
+            local matches = {}
+            for _, cmd in pairs(vim.tbl_keys(M.subcommands)) do
+               if vim.startswith(cmd, arg_lead) then
+                  table.insert(matches, cmd)
+               end
+            end
+            return matches
+         end,
       }
    )
 end
