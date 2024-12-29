@@ -66,6 +66,6 @@ M.construct_path = function(input, storage_dir)
    end
 
    -- 4. Default case: Expand relative to storage_dir
-   return vim.fn.fnamemodify(storage_dir, ":p") .. "/" .. input
+   return vim.fn.fnamemodify(storage_dir, ":p") .. input
 end
 return M
