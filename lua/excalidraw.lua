@@ -53,9 +53,9 @@ M.create_excalidraw_file = function()
       vim.notify("Filename cannot be empty!", vim.log.levels.ERROR)
       return
    end
-
+   input_path = input_path ..".excalidraw"
    -- 2. expand to absolute
-   local filepath = path_handler.construct_path(input_path .. ".excalidraw", storage_dir)
+   local filepath = path_handler.construct_path(input_path, storage_dir)
    --TODO: handle better the difference between displayed relative path and the path where to actually save the file
    -- Check if the file already exists
    if vim.fn.filereadable(filepath) == 1 then
@@ -96,7 +96,12 @@ M.create_excalidraw_file = function()
    end
 
    -- 5. Insert a Markdown link to the new file at the current cursor position
-   local markdown_link = "[" .. input_path .. "](" .. filepath .. ")"
+   local markdown_link = ""
+   if config.relative_path then
+      markdown_link = "[" .. input_path .. "](" .. input_path .. ")"
+   else
+      markdown_link = "[" .. input_path .. "](" .. filepath .. ")"
+   end
    vim.api.nvim_put({ markdown_link }, 'l', true, true)
 
    -- 6. Open the newly created file

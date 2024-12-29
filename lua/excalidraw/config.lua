@@ -3,6 +3,7 @@ M = {}
 local config = {
    storage_dir = "~/.excalidraw",
    open_on_create = true,
+   relative_path = true
 }
 
 function M.set(config_overrides)
