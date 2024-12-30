@@ -20,23 +20,33 @@ function M.octal_to_decimal(octal)
 end
 
 ---@param dir string The directory path to ensure exists.
-function M.ensure_directory_exists(dir)
+function M.ensure_directory_exists(dir, opts)
+   opts = opts or { notify = true } -- Default behavior includes notifications
+
    if vim.fn.isdirectory(dir) == 1 then
-      return 0
+      return true
    end
-   -- Create the directory with 'p' flag to make parent directories if needed
+
+   -- Attempt to create the directory
    local success, err = pcall(function()
       vim.fn.mkdir(dir, "p")
-   end
-   )
+   end)
 
    if not success then
       if err:match("Vim:E739") then
-         vim.notify("Permission denied: Cannot create directory '" .. dir .. "'", vim.log.levels.ERROR)
+         if opts.notify then
+            vim.notify("Permission denied: Cannot create directory '" .. dir .. "'", vim.log.levels.ERROR)
+         end
+         return false, "Permission denied"
       else
-         vim.notify("Error creating directory '" .. dir .. "': " .. err, vim.log.levels.ERROR)
+         if opts.notify then
+            vim.notify("Error creating directory '" .. dir .. "': " .. err, vim.log.levels.ERROR)
+         end
+         return false, err
       end
    end
+
+   return true
 end
 
 return M
