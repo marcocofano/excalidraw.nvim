@@ -11,7 +11,7 @@ function M.build_commands()
       function(args)
          local cmd = args.fargs[1]
          if M.subcommands[cmd] then
-            M.subcommands[cmd].run(args.fargs)
+            M.subcommands[cmd].run(vim.list_slice(args.fargs, 2))
          else
             vim.api.nvim_err_writeln("Invalid subcommand: " .. (cmd or ""))
          end
@@ -30,5 +30,12 @@ function M.build_commands()
       }
    )
 end
+
+local open = require "excalidraw.commands.open"
+local create = require "excalidraw.commands.create"
+
+M.register_subcommand("open", open)
+M.register_subcommand("create", create)
+
 
 return M
