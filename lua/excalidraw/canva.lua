@@ -38,7 +38,7 @@ Canva.new = function(title, filename, absolute_path, relative_path, type)
    return self
 end
 
-function Canva:write_to_file()
+Canva.write_to_file = function (self)
    -- TODO: check if I can use pcall here
    local file = io.open(self.absolute_path, "w")
    if file then
@@ -52,7 +52,7 @@ end
 
 ---@arg type string
 ---@return string|nil
-function Canva:build_markdown_link(relative_path)
+Canva.build_markdown_link = function (self, relative_path)
       local markdown_link = ""
       if relative_path then
          markdown_link = "[" .. self.title .. "](" .. self.relative_path .. ")"
@@ -62,7 +62,7 @@ function Canva:build_markdown_link(relative_path)
       return markdown_link
 end
 
-function Canva:set_content(content)
+Canva.set_content = function (self, content)
    if content then
       self.content = content
    end
@@ -77,10 +77,11 @@ end
 --    "the/relative/path/file.excalidraw",
 --    "excalidraw"
 --    )
+--
 
 
 
 
-print(vim.inspect(new_canva))
+-- print(vim.inspect(new_canva))
 
 return Canva

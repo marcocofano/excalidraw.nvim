@@ -6,12 +6,12 @@ function M.register_subcommand(name, handler)
    M.subcommands[name] = handler
 end
 
-function M.build_commands()
+function M.install(client)
    vim.api.nvim_create_user_command("Excalidraw",
       function(args)
          local cmd = args.fargs[1]
          if M.subcommands[cmd] then
-            M.subcommands[cmd].run(vim.list_slice(args.fargs, 2))
+            M.subcommands[cmd].run(client, vim.list_slice(args.fargs, 2))
          else
             vim.api.nvim_err_writeln("Invalid subcommand: " .. (cmd or ""))
          end

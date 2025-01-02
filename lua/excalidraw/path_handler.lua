@@ -45,8 +45,8 @@ end
 
 ---Construct the absolute path to the file.
 ---@param input string The link to construct the path for.
----@return string  The constructed absolute path.
-M.construct_path = function(input, storage_dir)
+---@return string | nil  The constructed absolute path.
+M.expand_to_absolute = function(input, storage_dir)
    if not input then return nil end
 
    -- 1. Absolute input, return as-is

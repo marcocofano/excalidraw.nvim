@@ -1,18 +1,36 @@
-M = {}
+local config = {}
 
-local config = {
-   storage_dir = "~/.excalidraw",
-   open_on_create = true,
-   relative_path = true
-}
+---@class excalidraw.config.ClientOpts
+---@field storage_dir string
+---@field open_on_reate boolean
+---@field relative_path boolean
+config.ClientOpts = {}
 
-function M.set(config_overrides)
-   config = vim.tbl_deep_extend("force", config, config_overrides or {})
+
+--- Get defaults
+---
+--- @return excalidraw.config.ClientOpts
+config.ClientOpts.default = function()
+   return {
+      storage_dir = "~/.excalidraw",
+      open_on_create = true,
+      relative_path = true
+   }
 end
 
-function M.get()
-   vim.inspect(config)
-   return config
+--- TODO: Missing validation
+---
+---Override defaults with new opts
+---
+---@param config_overrides table<string, any>
+---@param defaults excalidraw.config.ClientOpts|?-
+---
+---@return excalidraw.config.ClientOpts
+config.ClientOpts.set = function(config_overrides, defaults)
+   if not defaults then
+      defaults = config.ClientOpts.default()
+   end
+   return vim.tbl_deep_extend("force", defaults, config_overrides or {})
 end
 
-return M
+return config
