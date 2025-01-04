@@ -1,11 +1,11 @@
--- This is still not working but it is basically doing what it should 
+-- This is still not working but it is basically doing what it should
 --
 
 
-local open_command   = require "excalidraw.commands.open"
-local create_command = require "excalidraw.commands.create"
+local open_command = require "excalidraw.commands.open"
+local Canva        = require "excalidraw.canva"
 
-local M              = {}
+local M            = {}
 
 local function parse_input(filepath)
    -- Normalize the filepath using vim.fs API
@@ -23,32 +23,51 @@ end
 ---@param client excalidraw.Client
 ---@param data table<string>
 M.create_excalidraw_file_from_template = function(client, data)
-   -- INFO: this is new
-   if not client:templates_dir() then
-      log.err "Templates folder is not defined or does not exist"
+   if not client.opts.templates_dir then
+      vim.notify("Templates folder is not defined or does not exist", vim.log.levels.ERROR)
       return
    end
 
+   ---@type excalidraw.TelescopePicker
    local picker = client:picker()
    if not picker then
-      log.err "No picker configured"
+      vim.notify("No picker configured", vim.log.levels.ERROR)
       return
    end
-   ----
-
-   picker:find_templates({
-      callback = function()
+   picker:find_excalidraw_templates {
+      callback = function(template_path)
          local title = ""
          local dir = ""
 
-         local input_string
+         local function read_file_to_variable(filepath)
+            local file, err = io.open(filepath, "r") -- Open the file in read mode
+            if not file then
+               return nil, "Error opening file: " .. (err or "unknown error")
+            end
+
+            local content = file:read("*a") -- Read the entire file content
+            file:close()                    -- Close the file
+            return content
+         end
+
+         local template_content = read_file_to_variable(template_path)
+
+         local template = Canva.new(
+            "template",
+            "template",
+            template_path,
+            template_path,
+            template_content
+         )
+
+         local input_string = ""
          if #data > 0 then
             input_string = table.concat(data, " ")
          else
             input_string = vim.fn.input("Enter the name of the new Excalidraw file (without extension): ")
          end
 
-         if title == "" then
+         if input_string == "" then
             vim.notify("Filename cannot be empty!", vim.log.levels.ERROR)
             return
          end
@@ -57,6 +76,7 @@ M.create_excalidraw_file_from_template = function(client, data)
 
          ---@type excalidraw.Canva
          local canva = client:create_canva({ title = title, dir = dir, template = template })
+         print("dammi tutto:", vim.inspect({ canva }))
 
          canva:write_to_file()
          local link = canva:build_markdown_link(client.opts.relative_path)
@@ -68,11 +88,11 @@ M.create_excalidraw_file_from_template = function(client, data)
             open_command.open_excalidraw_file(client)
          end
       end
-   })
+   }
 end
 
 function M.run(client, data)
-   return M.create_excalidraw_file(client, data)
+   return M.create_excalidraw_file_from_template(client, data)
 end
 
 return M

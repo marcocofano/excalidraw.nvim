@@ -2,6 +2,7 @@ local config = {}
 
 ---@class excalidraw.config.ClientOpts
 ---@field storage_dir string
+---@field templates_dir string
 ---@field open_on_reate boolean
 ---@field relative_path boolean
 config.ClientOpts = {}
@@ -13,6 +14,7 @@ config.ClientOpts = {}
 config.ClientOpts.default = function()
    return {
       storage_dir = "~/.excalidraw",
+      templates_dir = "~/.excalidraw/templates",
       open_on_create = true,
       relative_path = true
    }

@@ -42,10 +42,11 @@ Client.create_canva = function(self, opts)
    end
    local filename = opts.title:gsub(" ", "_") .. ".excalidraw"
    local relative_path
-   if opts.dir then
+   if opts.dir and opts.dir ~= "" then
       relative_path = vim.fs.joinpath(opts.dir, filename)
+   else
+      relative_path = filename
    end
-   relative_path = filename
 
    local absolute_path = path_handler.expand_to_absolute(relative_path, self.opts.storage_dir)
    if vim.fn.filereadable(absolute_path) == 1 then
@@ -130,6 +131,12 @@ Client.default_template_content = function()
 }
 ]]
    return default_content
+end
+
+--Get the configured picker or default
+Client.picker = function(self)
+   local TelescopePicker = require "excalidraw.pickers"
+   return TelescopePicker.new(self)
 end
 
 return Client

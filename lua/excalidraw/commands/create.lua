@@ -21,14 +21,14 @@ M.create_excalidraw_file = function(client, data)
    local title = ""
    local dir = ""
 
-   local input_string
+   local input_string = ""
    if #data > 0 then
       input_string = table.concat(data, " ")
    else
       input_string = vim.fn.input("Enter the name of the new Excalidraw file (without extension): ")
    end
 
-   if title == "" then
+   if input_string == "" then
       vim.notify("Filename cannot be empty!", vim.log.levels.ERROR)
       return
    end

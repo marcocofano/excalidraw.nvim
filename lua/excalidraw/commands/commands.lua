@@ -33,9 +33,11 @@ end
 
 local open = require "excalidraw.commands.open"
 local create = require "excalidraw.commands.create"
+local create_from_template = require "excalidraw.commands.create_from_template"
 
 M.register_subcommand("open", open)
 M.register_subcommand("create", create)
+M.register_subcommand("create_from_template", create_from_template)
 
 
 return M

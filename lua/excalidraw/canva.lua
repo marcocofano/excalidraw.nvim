@@ -6,10 +6,8 @@
 ---@field absolute_path string|?
 ---@field relative_path string|?
 ---@field content string|?
-
 local Canva = {}
 Canva.__index = Canva
-
 
 Canva.new = function(title, filename, absolute_path, relative_path, content)
    local self = setmetatable({}, Canva)
@@ -23,13 +21,16 @@ end
 
 Canva.write_to_file = function (self)
    -- TODO: check if I can use pcall here
-   local file = io.open(self.absolute_path, "w")
-   if file then
-      file:write(self.content)
-      file:close()
-      vim.notify("Created new Excalidraw file: " .. self.absolute_path)
+   if self.content ~= nil then
+      local file = io.open(self.absolute_path, "w")
+      print("lets see")
+      if file then
+         file:write(self.content)
+         file:close()
+         vim.notify("Created new Excalidraw file: " .. self.absolute_path)
+      end
    else
-      vim.notify("Error creating file: " .. self.absolute_path, vim.log.levels.ERROR)
+      error("Error creating file: " .. self.absolute_path)
    end
 end
 
