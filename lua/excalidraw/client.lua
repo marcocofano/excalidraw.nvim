@@ -18,7 +18,7 @@ end
 ---@class excalidraw.CreateCanvaOpts
 ---@field title string
 ---@field dir string
----@field template string|?
+---@field template excalidra.Canva|?
 
 
 --- Create a new canva object
@@ -45,7 +45,7 @@ Client.create_canva = function(self, opts)
    if opts.dir then
       relative_path = vim.fs.joinpath(opts.dir, filename)
    end
-      relative_path = filename
+   relative_path = filename
 
    local absolute_path = path_handler.expand_to_absolute(relative_path, self.opts.storage_dir)
    if vim.fn.filereadable(absolute_path) == 1 then
@@ -61,10 +61,17 @@ Client.create_canva = function(self, opts)
    ---@type excalidraw.Canva
    local new_canva = Canva.new(
       opts.title,
-      opts.title,
+      filename,
       absolute_path,
       relative_path
    )
+
+   -- handle content creation
+   if not opts.template then
+      new_canva:set_content(self.default_template_content())
+   else
+      new_canva:set_content(opts.template.content)
+   end
    return new_canva
 end
 
@@ -105,6 +112,24 @@ Client.open_canva_link = function(self, link)
       vim.notify("No valid .excalidraw link found under cursor", vim.log.levels.WARN)
       return
    end
+end
+
+
+Client.default_template_content = function()
+   local default_content = [[
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://excalidraw.com",
+  "elements": [],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {}
+}
+]]
+   return default_content
 end
 
 return Client

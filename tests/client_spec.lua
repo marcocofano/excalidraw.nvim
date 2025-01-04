@@ -1,5 +1,33 @@
 local Client = require "excalidraw.client"
 local Path = require("plenary.path")
+local Canva = require "excalidraw.canva"
+
+local default_content = [[
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://excalidraw.com",
+  "elements": [],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {}
+}
+]]
+local template_content = [[
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://excalidraw.com",
+  "elements": [],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#aaaaaa"
+  },
+  "files": {}
+}
+]]
 
 
 describe("Client module", function()
@@ -48,26 +76,51 @@ describe("Client module", function()
             local valid_title = "validtitle"
             client:create_canva({ title = valid_title })
         end)
-        
+
         -- Missing only template (template is optional in this implementation, so no error expected)
         assert.has_no.errors(function()
             local valid_title = "validtitle"
             local dir = "directory"
-            client:create_canva({ title = valid_title, dir = dir})
+            client:create_canva({ title = valid_title, dir = dir })
         end)
     end)
 
     -- Test correct creation of a Canva object
-    it("create_canva: should create a valid Canva object", function()
-        local opts = { title = "validtitle" }
+    it("create_canva: should create a valid Canva object, with default content", function()
+        local template = Canva.new(
+            "template_title",
+            "template_filename",
+            "template_filename.excalidraw",
+            "template_filename.excalidraw",
+            default_content
+
+        )
+        local opts = { title = "validtitle", dir = "test_dir", template = template }
         local canva = client:create_canva(opts)
 
         -- Verify that the canva object is created correctly
         assert.is_not_nil(canva, "Expected Canva object to be created")
         assert.equals("validtitle", canva.title, "Expected Canva title to match opts.title")
         assert.equals("validtitle.excalidraw", canva.relative_path, "Expected relative path to include .excalidraw")
-        assert.equals(vim.fs.joinpath(temp_dir:absolute(), "validtitle.excalidraw"), canva.absolute_path,
-            "Expected absolute path to be correct")
+        assert.equals(default_content, canva.content, "Canva content dows not equal the default")
+    end)
+    it("create_canva: should create a valid Canva object, with template", function()
+        local template = Canva.new(
+            "template_title",
+            "template_filename",
+            "template_filename.excalidraw",
+            "template_filename.excalidraw",
+            template_content
+
+        )
+        local opts = { title = "validtitle", dir = "test_dir", template = template }
+        local canva = client:create_canva(opts)
+
+        -- Verify that the canva object is created correctly
+        assert.is_not_nil(canva, "Expected Canva object to be created")
+        assert.equals("validtitle", canva.title, "Expected Canva title to match opts.title")
+        assert.equals("validtitle.excalidraw", canva.relative_path, "Expected relative path to include .excalidraw")
+        assert.equals(template_content, canva.content, "Canva content dows not equal the template")
     end)
 
 
@@ -86,7 +139,7 @@ describe("Client module", function()
             end, expected_error)
         end
     end)
-    
+
     -- Test more edge cases for the title
     it("create_canva: should handle edge cases with non standard titles", function()
         local cases = {
@@ -113,4 +166,8 @@ describe("Client module", function()
     --     local canva = client:create_canva(opts)
     --     assert.is_nil(canva, "Expected Canva creation to return nil when file exists")
     -- end)
+
+    it("default content: get default", function()
+        assert.equals(default_content, client:default_template_content())
+    end)
 end)

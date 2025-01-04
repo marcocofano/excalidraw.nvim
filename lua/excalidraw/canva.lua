@@ -11,28 +11,13 @@ local Canva = {}
 Canva.__index = Canva
 
 
-local default_content = [[
-{
-  "type": "excalidraw",
-  "version": 2,
-  "source": "https://excalidraw.com",
-  "elements": [],
-  "appState": {
-    "gridSize": null,
-    "viewBackgroundColor": "#afffff"
-  },
-  "files": {}
-}
-]]
-
-
-Canva.new = function(title, filename, absolute_path, relative_path, type)
+Canva.new = function(title, filename, absolute_path, relative_path, content)
    local self = setmetatable({}, Canva)
    self.title = title
    self.filename = filename
    self.absolute_path = absolute_path
    self.relative_path = relative_path
-   self.content = default_content
+   self.content = content
    return self
 end
 
@@ -65,21 +50,5 @@ Canva.set_content = function (self, content)
       self.content = content
    end
 end
-
-
--- ---@type excalidraw.Canva
--- local new_canva = Canva.new(
---    "title",
---    "filename",
---    "/the/path/is/absolute/file.excalidraw",
---    "the/relative/path/file.excalidraw",
---    "excalidraw"
---    )
---
-
-
-
-
--- print(vim.inspect(new_canva))
 
 return Canva

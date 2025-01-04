@@ -14,7 +14,7 @@ local function parse_input(filepath)
    return parent, title
 end
 
--- Create an excalidraw canva file and a markdown link to it, optionally it opens it
+---Create an excalidraw canva file and a markdown link to it, optionally it opens it
 ---@param client excalidraw.Client
 ---@param data table<string>
 M.create_excalidraw_file = function(client, data)
@@ -35,26 +35,9 @@ M.create_excalidraw_file = function(client, data)
 
    dir, title = parse_input(input_string)
 
-   local new_content = [[
-{
-  "type": "excalidraw",
-  "version": 2,
-  "source": "https://excalidraw.com",
-  "elements": [],
-  "appState": {
-    "gridSize": null,
-    "viewBackgroundColor": "#ffffff"
-  },
-  "files": {}
-}
-]]
 
    ---@type excalidraw.Canva
    local canva = client:create_canva({ title = title, dir = dir })
-   -- Create the new .excalidraw file with a default empty JSON structure.
-   -- TODO: handle the default used. For example from templates or a different one from config
-
-   canva:set_content(new_content)
 
    canva:write_to_file()
    local link = canva:build_markdown_link(client.opts.relative_path)
