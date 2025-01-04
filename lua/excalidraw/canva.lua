@@ -6,7 +6,6 @@
 ---@field absolute_path string|?
 ---@field relative_path string|?
 ---@field content string|?
----@field type string|? TODO: change it to enum in case we extend out from excalidaw, for now the string excalidraw
 
 local Canva = {}
 Canva.__index = Canva
@@ -34,7 +33,6 @@ Canva.new = function(title, filename, absolute_path, relative_path, type)
    self.absolute_path = absolute_path
    self.relative_path = relative_path
    self.content = default_content
-   self.type = type
    return self
 end
 

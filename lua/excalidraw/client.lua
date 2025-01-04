@@ -17,8 +17,8 @@ end
 
 ---@class excalidraw.CreateCanvaOpts
 ---@field title string
----@field type string
----@template string
+---@field dir string
+---@field template string|?
 
 
 --- Create a new canva object
@@ -33,12 +33,24 @@ end
 --- save separately the relative path, it might be used for the md link
 --- @return excalidraw.Canva
 Client.create_canva = function(self, opts)
-   local relative_path = opts.title .. "." .. opts.type
+   -- validate arguments
+   if not opts or opts == {} then
+      error("Client.create_canva error: no opts")
+   end
+   if opts.title == nil or opts.title == "" then
+      error("Client.create_canva error: missing argument opts.title")
+   end
+   local filename = opts.title:gsub(" ", "_") .. ".excalidraw"
+   local relative_path
+   if opts.dir then
+      relative_path = vim.fs.joinpath(opts.dir, filename)
+   end
+      relative_path = filename
 
    local absolute_path = path_handler.expand_to_absolute(relative_path, self.opts.storage_dir)
    if vim.fn.filereadable(absolute_path) == 1 then
       vim.notify("File already exists: " .. absolute_path, vim.log.levels.ERROR)
-      return Canva:new()
+      error("Client.create_canva error: File already exists")
    end
 
    local absolute_dir = vim.fn.fnamemodify(absolute_path, ":p:h")
@@ -51,18 +63,31 @@ Client.create_canva = function(self, opts)
       opts.title,
       opts.title,
       absolute_path,
-      relative_path,
-      "excalidraw"
+      relative_path
    )
    return new_canva
 end
 
+---Create a Canva object from a link
+---
+---@param self excalidraw.Client
+---@param link string
+---
+---@return excalidraw.Canva
+Client.get_canva_from_link = function(self, link)
+   return Canva.new(link)
+end
+
+---Create a Canva object from a link
+---
+---@param self excalidraw.Client
+---@param link string
 Client.open_canva_link = function(self, link)
    -- Check if the link ends with .excalidraw
    if string.match(link, '%.excalidraw$') then
       -- contruct path from the input
       local filepath = path_handler.expand_to_absolute(link, self.opts.storage_dir)
-      if vim.fn.filereadable(filepath) ~= 1 then
+      if vim.fn.filereadable(filepath) ~= 1 or filepath == nil then
          vim.notify("File not found: " .. filepath, vim.log.levels.ERROR)
          return
       end

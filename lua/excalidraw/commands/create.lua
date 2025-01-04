@@ -2,8 +2,16 @@ local open_command = require "excalidraw.commands.open"
 
 local M            = {}
 
-local function parse_input(data)
-   return vim.fn.join(data, "_")
+local function parse_input(filepath)
+   -- Normalize the filepath using vim.fs API
+   if not filepath then
+      error("Canva title cannot be nil")
+   end
+   filepath = filepath:gsub("\\", "/") -- for windows normalization
+   local parts = vim.split(filepath, "/")
+   local parent = table.concat(parts, "/", 1, #parts - 1)
+   local title = parts[#parts]
+   return parent, title
 end
 
 -- Create an excalidraw canva file and a markdown link to it, optionally it opens it
@@ -11,20 +19,21 @@ end
 ---@param data table<string>
 M.create_excalidraw_file = function(client, data)
    local title = ""
+   local dir = ""
 
-   print("test: ", vim.inspect(client))
-
-   --TODO: parse the input so that it handles the case of path, path plus title with and without spaces
+   local input_string
    if #data > 0 then
-      title = parse_input(data)
+      input_string = table.concat(data, " ")
    else
-      title = vim.fn.input("Enter the name of the new Excalidraw file (without extension): ")
+      input_string = vim.fn.input("Enter the name of the new Excalidraw file (without extension): ")
    end
 
    if title == "" then
       vim.notify("Filename cannot be empty!", vim.log.levels.ERROR)
       return
    end
+
+   dir, title = parse_input(input_string)
 
    local new_content = [[
 {
@@ -41,15 +50,10 @@ M.create_excalidraw_file = function(client, data)
 ]]
 
    ---@type excalidraw.Canva
-   local canva = client:create_canva({ title = title, type = "excalidraw" })
+   local canva = client:create_canva({ title = title, dir = dir })
    -- Create the new .excalidraw file with a default empty JSON structure.
    -- TODO: handle the default used. For example from templates or a different one from config
 
-   -- TODO: better error handling
-   if canva == nil then
-      return
-   end
-   print("Canva: ", vim.inspect(canva))
    canva:set_content(new_content)
 
    canva:write_to_file()

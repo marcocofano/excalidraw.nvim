@@ -54,7 +54,7 @@ M.expand_to_absolute = function(input, storage_dir)
       return input
    end
 
-   -- 2. Input path starting with "./" or similar, expand relative to CWD
+   -- 2. Input path starting with "./" or similar, expand relative to CWD  
    if input:sub(1, 2) == "./" then
       return vim.fn.getcwd() .. "/" .. input:sub(3)
    end
@@ -66,6 +66,7 @@ M.expand_to_absolute = function(input, storage_dir)
    end
 
    -- 4. Default case: Expand relative to storage_dir
-   return vim.fn.fnamemodify(storage_dir, ":p") .. input
+   return vim.fs.joinpath(vim.fn.fnamemodify(storage_dir, ":p"), input)
 end
+
 return M
