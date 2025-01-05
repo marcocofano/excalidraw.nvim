@@ -45,9 +45,11 @@ end
 
 ---Construct the absolute path to the file.
 ---@param input string The link to construct the path for.
----@return string | nil  The constructed absolute path.
+---@return string  The constructed absolute path.
 M.expand_to_absolute = function(input, storage_dir)
-   if not input then return nil end
+   if not input then
+      error("input path is mandatory to be expanded")
+   end
 
    -- 1. Absolute input, return as-is
    if input:sub(1, 1) == "/" then

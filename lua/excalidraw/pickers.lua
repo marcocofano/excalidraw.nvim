@@ -35,7 +35,7 @@ local function get_selected(prompt_bufnr, keep_open, allow_multiple)
    local entries = picker:get_multi_selection()
    if entries and #entries > 0 then
       if #entries > 1 and not allow_multiple then
-         vim.notify("This mapping does not allow multiple entries", vim.log.levels.ERROR)
+         vim.notify("This mapping does not allow multiple entries !!!", vim.log.levels.ERROR)
          return
       end
 
@@ -66,7 +66,7 @@ local function attach_picker_mappings(map, opts)
 
    if opts.callback then
       map({ "i", "n" }, "<CR>", function(prompt_bufnr)
-         local entries = get_selected(prompt_bufnr, false, opts.allow_multiple)
+         local entries = get_selected(prompt_bufnr, false, false)
          if entries then
             local values = vim.tbl_map(entry_to_value, entries)
             opts.callback(unpack(values))
@@ -150,7 +150,6 @@ TelescopePicker._build_find_cmd = function(self, path)
       additional_opts[#additional_opts + 1] = path
    end
    local find_command = vim.tbl_flatten { TelescopePicker._FIND_CMD, additional_opts }
-   print(vim.inspect(find_command))
    return find_command
 end
 

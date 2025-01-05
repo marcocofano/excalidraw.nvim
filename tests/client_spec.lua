@@ -87,29 +87,31 @@ describe("Client module", function()
 
     -- Test correct creation of a Canva object
     it("create_canva: should create a valid Canva object, with default content", function()
-        local template = Canva.new(
-            "template_title",
-            "template_filename",
-            "template_filename.excalidraw",
-            "template_filename.excalidraw",
+        local expected = Canva.new(
+            "validtitle",
+            vim.fn.expand(vim.fs.joinpath(temp_dir.filename, "test_dir/validtitle.excalidraw"), ":p"),
             default_content
 
         )
-        local opts = { title = "validtitle", dir = "test_dir", template = template }
+        local opts = { title = "validtitle", dir = "test_dir"}
         local canva = client:create_canva(opts)
 
         -- Verify that the canva object is created correctly
         assert.is_not_nil(canva, "Expected Canva object to be created")
-        assert.equals("validtitle", canva.title, "Expected Canva title to match opts.title")
-        assert.equals("validtitle.excalidraw", canva.relative_path, "Expected relative path to include .excalidraw")
-        assert.equals(default_content, canva.content, "Canva content dows not equal the default")
+        assert.equals(expected.title, canva.title, "Expected Canva title to match opts.title")
+        assert.equals(expected.path, canva.path, "Expected relative path to include parent dirs and .excalidraw")
+        assert.equals(expected.content, canva.content, "Canva content dows not equal the default")
     end)
     it("create_canva: should create a valid Canva object, with template", function()
         local template = Canva.new(
             "template_title",
-            "template_filename",
             "template_filename.excalidraw",
-            "template_filename.excalidraw",
+            template_content
+
+        )
+        local expected = Canva.new(
+            "validtitle",
+            vim.fn.expand(vim.fs.joinpath(temp_dir.filename, "test_dir/validtitle.excalidraw"), ":p"),
             template_content
 
         )
@@ -118,9 +120,9 @@ describe("Client module", function()
 
         -- Verify that the canva object is created correctly
         assert.is_not_nil(canva, "Expected Canva object to be created")
-        assert.equals("validtitle", canva.title, "Expected Canva title to match opts.title")
-        assert.equals("validtitle.excalidraw", canva.relative_path, "Expected relative path to include .excalidraw")
-        assert.equals(template_content, canva.content, "Canva content dows not equal the template")
+        assert.equals(expected.title, canva.title, "Expected Canva title to match opts.title")
+        assert.equals(expected.path, canva.path, "Expected relative path to include .excalidraw")
+        assert.equals(expected.content, canva.content, "Canva content dows not equal the template")
     end)
 
 

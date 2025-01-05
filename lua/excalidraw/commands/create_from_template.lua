@@ -1,8 +1,3 @@
--- This is still not working but it is basically doing what it should
---
-
-
-local open_command = require "excalidraw.commands.open"
 local Canva        = require "excalidraw.canva"
 
 local M            = {}
@@ -53,8 +48,6 @@ M.create_excalidraw_file_from_template = function(client, data)
          local template_content = read_file_to_variable(template_path)
 
          local template = Canva.new(
-            "template",
-            "template",
             template_path,
             template_path,
             template_content
@@ -76,16 +69,15 @@ M.create_excalidraw_file_from_template = function(client, data)
 
          ---@type excalidraw.Canva
          local canva = client:create_canva({ title = title, dir = dir, template = template })
-         print("dammi tutto:", vim.inspect({ canva }))
 
-         canva:write_to_file()
-         local link = canva:build_markdown_link(client.opts.relative_path)
+         client:save_canva(canva)
+         local link = client:build_markdown_link(canva)
 
          vim.api.nvim_put({ link }, 'l', true, false)
 
          if client.opts.open_on_create == true then
             vim.fn.searchpos("]", "e")
-            open_command.open_excalidraw_file(client)
+            client:open_canva_link(canva.path)
          end
       end
    }
