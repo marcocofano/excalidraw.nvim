@@ -6,47 +6,46 @@
 
 local path_handler = require "excalidraw.path_handler"
 local utils        = require "excalidraw.utils"
-local Canva        = require "excalidraw.canva"
+local Scene        = require "excalidraw.scene"
 
 ---@class excalidraw.Client
 ---@field opts excalidraw.config.ClientOpts
 local Client       = {}
 Client.__index     = Client
 
---TODO: change it to enum in case we extend out from excalidaw, for now the string excalidraw
 
-Client.new         = function(opts)
+Client.new = function(opts)
    local self = setmetatable({}, Client)
    self.opts = opts
 
-   self.opts.storage_dir = vim.fn.expand(self.opts.storage_dir, ":p")
+   self.opts.storage_dir = vim.fn.expand(self.opts.storage_dir)
    return self
 end
 
----@class excalidraw.CreateCanvaOpts
+---@class excalidraw.CreateSceneOpts
 ---@field title string
 ---@field dir string
----@field template excalidraw.Canva|?
+---@field template excalidraw.Scene|?
 
 
---- Create a new canva object
+--- Create a new scene object
 ---
---- This is a builder method to create the canvas from just a title
+--- This is a builder method to create the scenes from just a title
 ---
----@param opts excalidraw.CreateCanvaOpts Options
+---@param opts excalidraw.CreateSceneOpts Options
 ---
---- Create canva builder from the user input or input argument
+--- Create scene builder from the user input or input argument
 --- set filename with extension
 --- expand to absolute according to configs or input path
 --- save separately the relative path, it might be used for the md link
---- @return excalidraw.Canva
-Client.create_canva = function(self, opts)
+--- @return excalidraw.Scene
+Client.create_scene = function(self, opts)
    -- validate arguments
    if not opts or opts == {} then
-      error("Client.create_canva error: no opts")
+      error("Client.create_scene error: no opts")
    end
    if opts.title == nil or opts.title == "" then
-      error("Client.create_canva error: missing argument opts.title")
+      error("Client.create_scene error: missing argument opts.title")
    end
    local filename = opts.title:gsub(" ", "_") .. ".excalidraw"
    local relative_path
@@ -59,47 +58,61 @@ Client.create_canva = function(self, opts)
    local absolute_path = path_handler.expand_to_absolute(relative_path, self.opts.storage_dir)
    if vim.fn.filereadable(absolute_path) == 1 then
       vim.notify("File already exists: " .. absolute_path, vim.log.levels.ERROR)
-      error("Client.create_canva error: File already exists")
+      error("Client.create_scene error: File already exists")
    end
 
-   local absolute_dir = vim.fn.fnamemodify(absolute_path, ":p:h")
 
-   ---@type excalidraw.Canva
-   local new_canva = Canva.new(
+   ---@type excalidraw.Scene
+   local new_scene = Scene.new(
       opts.title,
       absolute_path
    )
 
    -- handle content creation
    if not opts.template then
-      new_canva:set_content(self.default_template_content())
+      new_scene:set_content(self.default_template_content())
    else
-      new_canva:set_content(opts.template.content)
+      new_scene:set_content(opts.template.content) --TODO: to be adjusted.. including better validation for content, like it is done in load_from_json 
    end
-   return new_canva
+   return new_scene
 end
 
-Client.save_canva = function(self, canva)
-   if canva == nil then -- TODO: make a is_valid method
-      error("No Canva to be saved")
+-- Load Scene from a file
+Client.load_scene_from_path = function(self, filepath)
+   --TODO: verify is_absolute and other client validation
+   local file = io.open(filepath, "r")
+   if not file then
+      error("Could not open file: " .. filepath)
+   end
+   local file_content = file:read("*a")
+   file:close()
+   local content = vim.json.decode(file_content) -- TODO: this is in correct, it si skipping the validation done in load_from_json, because the Scene is not build yet
+   local title = content.title or "Untitled"
+   return Scene.new(title, filepath, content)
+end
+
+---@param scene excalidraw.Scene
+Client.save_scene = function(self, scene)
+   if scene == nil then -- TODO: make a is_valid method
+      error("No scene to be saved")
    end
 
-   local absolute_path = path_handler.expand_to_absolute(canva.path, self.opts.storage_dir)
-   canva.path = absolute_path
+   local absolute_path = path_handler.expand_to_absolute(scene.path, self.opts.storage_dir)
+   scene.path = absolute_path
    utils.ensure_directory_exists(vim.fn.fnamemodify(absolute_path, ":h"))
-   canva:save()
+   scene:save()
 end
 
-Client.clone_canva = function(self, title, path, canva)
-   if canva == nil or canva.content == nil then --TODO: make a is_valid method?
-      vim.notify("Cannot clone. Provide a valid canva.")
+Client.clone_scene = function(self, title, path, scene)
+   if scene == nil or scene.content == nil then --TODO: make a is_valid method?
+      vim.notify("Cannot clone. Provide a valid scene.")
       return
    end
-   title = title or canva.title .. "(Copy)"
+   title = title or scene.title .. "(Copy)"
    if not path or path == "" then
-      local dirname = vim.fn.fnamemodify(canva.path, ":h")
-      local filename = vim.fn.fnamemodify(canva.path, ":t:r")
-      local extension = vim.fn.fnamemodify(canva.path, ":e")
+      local dirname = vim.fn.fnamemodify(scene.path, ":h")
+      local filename = vim.fn.fnamemodify(scene.path, ":t:r")
+      local extension = vim.fn.fnamemodify(scene.path, ":e")
 
       -- Construct the new filepath
       local new_filename = filename .. "_copy" .. "." .. extension
@@ -109,24 +122,24 @@ Client.clone_canva = function(self, title, path, canva)
    else
       path = path_handler.expand_to_absolute(path, self.opts.storage_dir)
    end
-   return Canva.new(title, path, canva.content)
+   return Scene.new(title, path, scene.content)
 end
 
----Create a Canva object from a link
+---Create a scene object from a link
 ---
 ---@param self excalidraw.Client
 ---@param link string
 ---
----@return excalidraw.Canva
-Client.get_canva_from_link = function(self, link)
-   return Canva.new(link)
+---@return excalidraw.Scene
+Client.get_scene_from_link = function(self, link)
+   return Scene.new(link)
 end
 
----Open a Canva object from a link
+---Open a Scene object from a link
 ---
 ---@param self excalidraw.Client
 ---@param link string
-Client.open_canva_link = function(self, link)
+Client.open_scene_link = function(self, link)
    -- Check if the link ends with .excalidraw
    if string.match(link, '%.excalidraw$') then
       -- contruct path from the input
@@ -160,6 +173,7 @@ local function is_absolute(path)
 end
 
 local function relative_to(path, other)
+   -- taken from Obsidian.nvim could use plenary's version from Path, given that Telescope is mandatory for now
    if not vim.endswith(other, "/") then
       other = other .. "/"
    end
@@ -196,10 +210,8 @@ Client.relative_path = function(self, path, opts)
    end)
 
    if ok and relative_path then
-      print("1: ", vim.inspect(relative_path))
       return relative_path
    elseif not is_absolute(path) then
-      print("2: ")
       return path
    elseif opts.strict then
       error(string.format("failed to resolve '%s' relative to root '%s'", path, self.opts.storage_dir))
@@ -207,37 +219,35 @@ Client.relative_path = function(self, path, opts)
 end
 
 
----@param canva excalidraw.Canva
+---@param scene excalidraw.Scene
 ---@return string|nil
-Client.build_markdown_link = function(self, canva)
+Client.build_markdown_link = function(self, scene)
    local markdown_link = ""
-   if not canva.path or canva.path == "" then
+   if not scene.path or scene.path == "" then
       return nil
    end
    if self.opts.relative_path then
-      local relative_path = self:relative_path(canva.path, { strict = true })
+      local relative_path = self:relative_path(scene.path, { strict = true })
 
-      markdown_link = "[" .. canva.title .. "](" .. relative_path .. ")"
+      markdown_link = "[" .. scene.title .. "](" .. relative_path .. ")"
    else
-      markdown_link = "[" .. canva.title .. "](" .. canva.path .. ")"
+      markdown_link = "[" .. scene.title .. "](" .. scene.path .. ")"
    end
    return markdown_link
 end
 
 Client.default_template_content = function()
-   local default_content = [[
-{
-  "type": "excalidraw",
-  "version": 2,
-  "source": "https://excalidraw.com",
-  "elements": [],
-  "appState": {
-    "gridSize": null,
-    "viewBackgroundColor": "#ffffff"
-  },
-  "files": {}
-}
-]]
+   local default_content = {
+      type = "excalidraw",       -- TODO: type excalidraw only
+      version = 2,               -- TODO: only version 2 available
+      title = "Scene Title",
+      source = "https://www.excalidraw.com", -- TODO: only this source fixed for now
+      elements = {},
+      appState = {
+         gridSize = nil,
+         viewBackgroundColor = "#aaaaaa"
+      }
+   }
    return default_content
 end
 

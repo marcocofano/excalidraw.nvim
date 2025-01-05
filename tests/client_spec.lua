@@ -1,33 +1,35 @@
+local describe = require("plenary.busted").describe
+local it = require("plenary.busted").it
+local before_each = require("plenary.busted").before_each
+local after_each = require("plenary.busted").after_each
+
 local Client = require "excalidraw.client"
 local Path = require("plenary.path")
-local Canva = require "excalidraw.canva"
+local Scene = require "excalidraw.scene"
 
-local default_content = [[
-{
-  "type": "excalidraw",
-  "version": 2,
-  "source": "https://excalidraw.com",
-  "elements": [],
-  "appState": {
-    "gridSize": null,
-    "viewBackgroundColor": "#ffffff"
-  },
-  "files": {}
+local default_content = {
+    type = "excalidraw",                   -- TODO: type excalidraw only
+    version = 2,                           -- TODO: only version 2 available
+    title = "Scene Title",
+    source = "https://www.excalidraw.com", -- TODO: only this source fixed for now
+    elements = {},
+    appState = {
+        gridSize = nil,
+        viewBackgroundColor = "#aaaaaa"
+    }
 }
-]]
-local template_content = [[
-{
-  "type": "excalidraw",
-  "version": 2,
-  "source": "https://excalidraw.com",
-  "elements": [],
-  "appState": {
-    "gridSize": null,
-    "viewBackgroundColor": "#aaaaaa"
-  },
-  "files": {}
+
+local template_content = {
+    type = "excalidraw",                   -- TODO: type excalidraw only
+    version = 2,                           -- TODO: only version 2 available
+    title = "Scene Title",
+    source = "https://www.excalidraw.com", -- TODO: only this source fixed for now
+    elements = {},
+    appState = {
+        gridSize = nil,
+        viewBackgroundColor = "#bbbbbb"
+    }
 }
-]]
 
 
 describe("Client module", function()
@@ -60,100 +62,99 @@ describe("Client module", function()
             "Client.opts should contain the correct storage_dir value")
     end)
 
-    it("create_canva: should validate arguments and handle nil values", function()
+    it("create_scene: should validate arguments and handle nil values", function()
         -- Missing opts
         assert.has_error(function()
-            client:create_canva(nil)
-        end, "Client.create_canva error: no opts")
+            client:create_scene(nil)
+        end, "Client.create_scene error: no opts")
 
         -- Missing title
         assert.has_error(function()
-            client:create_canva({ template = "template.json" })
-        end, "Client.create_canva error: missing argument opts.title")
+            client:create_scene({ template = "template.json" })
+        end, "Client.create_scene error: missing argument opts.title")
 
         -- Missing template, and dir (template is optional in this implementation, so no error expected)
         assert.has_no.errors(function()
             local valid_title = "validtitle"
-            client:create_canva({ title = valid_title })
+            client:create_scene({ title = valid_title })
         end)
 
         -- Missing only template (template is optional in this implementation, so no error expected)
         assert.has_no.errors(function()
             local valid_title = "validtitle"
             local dir = "directory"
-            client:create_canva({ title = valid_title, dir = dir })
+            client:create_scene({ title = valid_title, dir = dir })
         end)
     end)
 
-    -- Test correct creation of a Canva object
-    it("create_canva: should create a valid Canva object, with default content", function()
-        local expected = Canva.new(
+    -- Test correct creation of a Scene object
+    it("create_scene: should create a valid Scene object, with default content", function()
+        local expected = Scene.new(
             "validtitle",
-            vim.fn.expand(vim.fs.joinpath(temp_dir.filename, "test_dir/validtitle.excalidraw"), ":p"),
+            vim.fn.expand(vim.fs.joinpath(temp_dir.filename, "test_dir/validtitle.excalidraw")),
             default_content
 
         )
-        local opts = { title = "validtitle", dir = "test_dir"}
-        local canva = client:create_canva(opts)
+        local opts = { title = "validtitle", dir = "test_dir" }
+        local scene = client:create_scene(opts)
 
-        -- Verify that the canva object is created correctly
-        assert.is_not_nil(canva, "Expected Canva object to be created")
-        assert.equals(expected.title, canva.title, "Expected Canva title to match opts.title")
-        assert.equals(expected.path, canva.path, "Expected relative path to include parent dirs and .excalidraw")
-        assert.equals(expected.content, canva.content, "Canva content dows not equal the default")
+        -- Verify that the scene object is created correctly
+        assert.is_not_nil(scene, "Expected Scene object to be created")
+        assert.are.same(expected.title, scene.title, "Expected Scene title to match opts.title")
+        assert.are.same(expected.path, scene.path, "Expected relative path to include parent dirs and .excalidraw")
+        assert.are.same(expected.content, scene.content, "Scene content does not equal the default")
     end)
-    it("create_canva: should create a valid Canva object, with template", function()
-        local template = Canva.new(
+    it("create_scene: should create a valid Scene object, with template", function()
+        local template = Scene.new(
             "template_title",
             "template_filename.excalidraw",
             template_content
-
         )
-        local expected = Canva.new(
+        local expected = Scene.new(
             "validtitle",
-            vim.fn.expand(vim.fs.joinpath(temp_dir.filename, "test_dir/validtitle.excalidraw"), ":p"),
+            vim.fn.expand(vim.fs.joinpath(temp_dir.filename, "test_dir/validtitle.excalidraw")),
             template_content
 
         )
         local opts = { title = "validtitle", dir = "test_dir", template = template }
-        local canva = client:create_canva(opts)
+        local scene = client:create_scene(opts)
 
-        -- Verify that the canva object is created correctly
-        assert.is_not_nil(canva, "Expected Canva object to be created")
-        assert.equals(expected.title, canva.title, "Expected Canva title to match opts.title")
-        assert.equals(expected.path, canva.path, "Expected relative path to include .excalidraw")
-        assert.equals(expected.content, canva.content, "Canva content dows not equal the template")
+        -- Verify that the scene object is created correctly
+        assert.is_not_nil(scene, "Expected Scene object to be created")
+        assert.are.same(expected.title, scene.title, "Expected Scene title to match opts.title")
+        assert.are.same(expected.path, scene.path, "Expected relative path to include .excalidraw")
+        assert.are.same(expected.content, scene.content, "Scene content dows not equal the template")
     end)
 
 
     -- Test edge cases for the title
-    it("create_canva: should handle edge cases with invalid titles", function()
+    it("create_scene: should handle edge cases with invalid titles", function()
         local cases = {
-            [""] = "Client.create_canva error: missing argument opts.title",
+            [""] = "Client.create_scene error: missing argument opts.title",
             -- ["a/b/c"] = "Filename cannot contain directory separators",
             -- [".hiddenfile"] = "Filename cannot start with a dot",
         }
 
         for title, expected_error in pairs(cases) do
             assert.has_error(function()
-                local canva = client:create_canva({ title = title })
-                print("test: ", vim.inspect(canva))
+                local scene = client:create_scene({ title = title })
+                print("test: ", vim.inspect(scene))
             end, expected_error)
         end
     end)
 
     -- Test more edge cases for the title
-    it("create_canva: should handle edge cases with non standard titles", function()
+    it("create_scene: should handle edge cases with non standard titles", function()
         local cases = {
-            [""] = "Client.create_canva error: missing argument opts.title",
+            [""] = "Client.create_scene error: missing argument opts.title",
             -- ["a/b/c"] = "Filename cannot contain directory separators",
             -- [".hiddenfile"] = "Filename cannot start with a dot",
         }
 
         for title, expected_error in pairs(cases) do
             assert.has_error(function()
-                local canva = client:create_canva({ title = title })
-                print("test: ", vim.inspect(canva))
+                local scene = client:create_scene({ title = title })
+                print("test: ", vim.inspect(scene))
             end, expected_error)
         end
     end)
@@ -165,11 +166,11 @@ describe("Client module", function()
     --     -- Mock filereadable to simulate existing file
     --     vim.fn.filereadable = function() return 1 end
     --
-    --     local canva = client:create_canva(opts)
-    --     assert.is_nil(canva, "Expected Canva creation to return nil when file exists")
+    --     local scene = client:create_scene(opts)
+    --     assert.is_nil(scene, "Expected Scene creation to return nil when file exists")
     -- end)
 
     it("default content: get default", function()
-        assert.equals(default_content, client:default_template_content())
+        assert.are.same(default_content, client:default_template_content())
     end)
 end)

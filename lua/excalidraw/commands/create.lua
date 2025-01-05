@@ -1,11 +1,9 @@
-local open_command = require "excalidraw.commands.open"
-
-local M            = {}
+local M = {}
 
 local function parse_input(filepath)
    -- Normalize the filepath using vim.fs API
    if not filepath then
-      error("Canva title cannot be nil")
+      error("Scene title cannot be nil")
    end
    filepath = filepath:gsub("\\", "/") -- for windows normalization
    local parts = vim.split(filepath, "/")
@@ -14,7 +12,7 @@ local function parse_input(filepath)
    return parent, title
 end
 
----Create an excalidraw canva file and a markdown link to it, optionally it opens it
+---Create an excalidraw scene file and a markdown link to it, optionally it opens it
 ---@param client excalidraw.Client
 ---@param data table<string>
 M.create_excalidraw_file = function(client, data)
@@ -36,17 +34,18 @@ M.create_excalidraw_file = function(client, data)
    dir, title = parse_input(input_string)
 
 
-   ---@type excalidraw.Canva
-   local canva = client:create_canva({ title = title, dir = dir })
+   ---@type excalidraw.Scene
+   local scene = client:create_scene({ title = title, dir = dir })
 
-   client:save_canva(canva)
-   local link = client:build_markdown_link(canva)
+
+   client:save_scene(scene)
+   local link = client:build_markdown_link(scene)
 
    vim.api.nvim_put({ link }, 'l', true, false)
 
    if client.opts.open_on_create == true then
       vim.fn.searchpos("]", "e")
-      client:open_canva_link(canva.path)
+      client:open_scene_link(scene.path)
    end
 end
 
@@ -56,7 +55,3 @@ function M.run(client, data)
 end
 
 return M
-
-
-
-

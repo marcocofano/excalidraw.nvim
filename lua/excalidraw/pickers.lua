@@ -2,7 +2,7 @@ local telescope         = require "telescope.builtin"
 local telescope_actions = require "telescope.actions"
 local actions_state     = require "telescope.actions.state"
 
-local Canva             = require "excalidraw.canva"
+local Scene             = require "excalidraw.scene"
 
 ---@class excalidraw.TelescopePicker
 ---
@@ -112,7 +112,7 @@ end
 
 -- ---@param opts { prompt_title: string|?, callback: fun(path: string)|?, no_default_mappings: boolean|?}
 -- TelescopePicker.find_excalidraw_templates = function(self, opts)
---    local template = Canva.new()
+--    local template = Scene.new()
 --    template.content = self.client.default_template_content()
 --    opts.callback(template)
 -- end

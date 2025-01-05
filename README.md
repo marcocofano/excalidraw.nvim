@@ -6,18 +6,18 @@ The plugin handles excalidraw (or other drawing tool, in the future) links to lo
 helps using these tools within your .md notes and store all files in a sensible way. It includes pickers to manage
 creation and opening of the links with the right app.
 
-It creates default canvas according to your setup configuration. It can also handle template canvas!
+It creates default scenes according to your setup configuration. It can also handle template scenes!
 
 ## features
 
-- Open canvas files. `gx` works oput of the box fine if you have the excalidraw app installed as a PWA and configured as
+- Open scenes files. `gx` works oput of the box fine if you have the excalidraw app installed as a PWA and configured as
   default application for .excalidraw files. The plugin provides a cusom opener that tries to find the file in the link
   in a smarter way, if you use relative paths.
-- Create new canvas file (and possibly open it in app). From .md files, give it a name and it creates the canva, a link
+- Create new scenes file (and possibly open it in app). From .md files, give it a name and it creates the scene, a link
   to the file and puts the cursor on the name (at the start) and optionally opens it with the default app. You can
-  configure where to save your canvas.
+  configure where to save your scenes.
 - default keymaps ???
-- Templates: It can open, save and reuse templates canvas. It uses custom or Telescope pickers. vim-fzf available in the
+- Templates: It can open, save and reuse templates scenes. It uses custom or Telescope pickers. vim-fzf available in the
   future. You can use one of the templates as default (it defaults to use a blank one).
 
 ## Usage
