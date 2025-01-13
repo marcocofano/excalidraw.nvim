@@ -28,6 +28,8 @@ end
 ---@field template excalidraw.Scene|?
 
 
+
+
 --- Create a new scene object
 ---
 --- This is a builder method to create the scenes from just a title
@@ -70,25 +72,23 @@ Client.create_scene = function(self, opts)
 
    -- handle content creation
    if not opts.template then
-      new_scene:set_content(self.default_template_content())
+      new_scene:load_content_from_table(self.default_template_content())
    else
-      new_scene:set_content(opts.template.content) --TODO: to be adjusted.. including better validation for content, like it is done in load_from_json 
+      new_scene:load_content_from_table(opts.template.content) --TODO: to be adjusted.. including better validation for content, like it is done in load_from_json
    end
    return new_scene
 end
 
 -- Load Scene from a file
-Client.load_scene_from_path = function(self, filepath)
+Client.create_scene_from_path = function(self, filepath)
    --TODO: verify is_absolute and other client validation
    local file = io.open(filepath, "r")
    if not file then
       error("Could not open file: " .. filepath)
    end
-   local file_content = file:read("*a")
+   local content = file:read("*a")
    file:close()
-   local content = vim.json.decode(file_content) -- TODO: this is in correct, it si skipping the validation done in load_from_json, because the Scene is not build yet
-   local title = content.title or "Untitled"
-   return Scene.new(title, filepath, content)
+   return Scene.from_json(filepath, content)
 end
 
 ---@param scene excalidraw.Scene
@@ -103,37 +103,52 @@ Client.save_scene = function(self, scene)
    scene:save()
 end
 
-Client.clone_scene = function(self, title, path, scene)
-   if scene == nil or scene.content == nil then --TODO: make a is_valid method?
-      vim.notify("Cannot clone. Provide a valid scene.")
-      return
-   end
-   title = title or scene.title .. "(Copy)"
-   if not path or path == "" then
-      local dirname = vim.fn.fnamemodify(scene.path, ":h")
-      local filename = vim.fn.fnamemodify(scene.path, ":t:r")
-      local extension = vim.fn.fnamemodify(scene.path, ":e")
+-- Client.clone_scene = function(self, title, path, scene)
+--    if scene == nil or scene.content == nil then --TODO: make a is_valid method?
+--       vim.notify("Cannot clone. Provide a valid scene.")
+--       return
+--    end
+--    title = title or scene.title .. "(Copy)"
+--    if not path or path == "" then
+--       local dirname = vim.fn.fnamemodify(scene.path, ":h")
+--       local filename = vim.fn.fnamemodify(scene.path, ":t:r")
+--       local extension = vim.fn.fnamemodify(scene.path, ":e")
+--
+--       -- Construct the new filepath
+--       local new_filename = filename .. "_copy" .. "." .. extension
+--       local new_filepath = vim.fs.joinpath(dirname, new_filename)
+--
+--       path = new_filepath
+--    else
+--       path = path_handler.expand_to_absolute(path, self.opts.storage_dir)
+--    end
+--    return Scene.new(path, scene.content)
+-- end
 
-      -- Construct the new filepath
-      local new_filename = filename .. "_copy" .. "." .. extension
-      local new_filepath = vim.fs.joinpath(dirname, new_filename)
+-- ---Create a scene object from a link
+-- ---
+-- ---@param self excalidraw.Client
+-- ---@param link string
+-- ---
+-- ---@return excalidraw.Scene
+-- Client.get_scene_from_link = function(self, link)
+--    return Scene.new(link)
+-- end
 
-      path = new_filepath
-   else
-      path = path_handler.expand_to_absolute(path, self.opts.storage_dir)
-   end
-   return Scene.new(title, path, scene.content)
-end
+-- Client.open_scene = function(self, scene)
+--    local scene_json = scene:to_json()
+--    local url = "https://excalidraw.com/#json=" .. vim.fn.escape(scene_json, " ")
+--
+--    local cmd = ""
+--    if self.opts.open_as_pwa then
+--       cmd = "/opt/google/chrome/google-chrome  --app=" .. url
+--       vim.fn.escape(scene_json, " ")
+--    else
+--       cmd = "xdg-open --app=" .. url -- Adjust for your OS
+--    end
+--    os.execute(cmd)
+-- end
 
----Create a scene object from a link
----
----@param self excalidraw.Client
----@param link string
----
----@return excalidraw.Scene
-Client.get_scene_from_link = function(self, link)
-   return Scene.new(link)
-end
 
 ---Open a Scene object from a link
 ---
@@ -159,7 +174,7 @@ Client.open_scene_link = function(self, link)
          vim.cmd('silent !xdg-open ' .. vim.fn.shellescape(filepath))
       end
    else
-      vim.notify("No valid .excalidraw link found under cursor", vim.log.levels.WARN)
+      vim.notify("No valid .excalidraw link", vim.log.levels.DEBUG)
       return
    end
 end
@@ -238,15 +253,15 @@ end
 
 Client.default_template_content = function()
    local default_content = {
-      type = "excalidraw",       -- TODO: type excalidraw only
-      version = 2,               -- TODO: only version 2 available
-      title = "Scene Title",
+      type = "excalidraw",                   -- TODO: type excalidraw only
+      version = 2,                           -- TODO: only version 2 available
       source = "https://www.excalidraw.com", -- TODO: only this source fixed for now
       elements = {},
       appState = {
          gridSize = nil,
          viewBackgroundColor = "#aaaaaa"
-      }
+      },
+      files = {}
    }
    return default_content
 end
@@ -256,5 +271,6 @@ Client.picker = function(self)
    local TelescopePicker = require "excalidraw.pickers"
    return TelescopePicker.new(self)
 end
+
 
 return Client

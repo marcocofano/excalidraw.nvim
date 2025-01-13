@@ -30,7 +30,7 @@ In Lazy:
 ```lua
 { "marcocofano/excalidraw.nvim",
    config = function()
-        require("excalidraw").configure(configuration)
+        require("excalidraw").setup(configuration)
     end
 }
 ```

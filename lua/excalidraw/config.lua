@@ -5,6 +5,7 @@ local config = {}
 ---@field templates_dir string
 ---@field open_on_create boolean
 ---@field relative_path boolean
+---
 config.ClientOpts = {}
 
 

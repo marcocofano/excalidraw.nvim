@@ -5,9 +5,8 @@
 ---@class excalidraw.SceneContent
 ---
 ---@field type string
----@field version string
+---@field version integer
 ---@field source string
----@field title string
 ---@field elements table
 ---@field appState table
 ---@field files table
@@ -24,28 +23,49 @@ Scene.__index = Scene
 
 Scene.new = function(title, path, content)
    local self = setmetatable({}, Scene)
-   self.title = title or "Untitled Scene"
    self.path = path
-   self.content = content or {
-      type = "excalidraw",       -- TODO: type excalidraw only
-      version = 2,               -- TODO: only version 2 available
-      title = self.title,
+   self.title = title
+   self.content = {
+      type = "excalidraw",                   -- TODO: type excalidraw only
+      version = 2,                           -- TODO: only version 2 available
       source = "https://www.excalidraw.com", -- TODO: only this source fixed for now
       elements = {},
       appState = {
-         gridSize = nil,
+         gridSize = 10,
          viewBackgroundColor = "#aaaaaa"
-      }
+      },
+      files = {}
    }
+   self:load_content_from_table(content)
    return self
 end
 
-Scene.load_from_json = function(self, json_content)
-   local decoded = vim.fn.json_decode(json_content)
 
-   self.content.elements = decoded.elements or self.content.elements
-   self.content.appState = vim.tbl_deep_extend("force", self.content.appState, decoded.appState or {})
-   self.content.files = decoded.files or self.content.files
+
+
+Scene.load_content_from_table = function(self, content, overwrite)
+   content = content or {}
+   overwrite = overwrite or false
+
+   if overwrite == true then
+      self.content.elements = content.elements or {}
+      self.content.appState = content.appState or {}
+      self.content.files = content.files or {}
+   else
+      self.content.elements = vim.tbl_deep_extend("force", self.content.elements, content.elements or {})
+      self.content.appState = vim.tbl_deep_extend("force", self.content.appState, content.appState or {})
+      self.content.files = vim.tbl_deep_extend("force", self.content.files, content.files or {})
+   end
+   return self
+end
+
+Scene.from_json = function(path, json_content)
+   local scene = Scene.new(path, json_content)
+   json_content = json_content or '{}'
+
+   local decoded_content = vim.fn.json_decode(json_content)
+   scene:load_content_from_table(decoded_content, false)
+   return scene
 end
 
 Scene.to_json = function(self)
@@ -56,13 +76,6 @@ Scene.add_element = function(self, element)
    table.insert(self.content.elements, element)
 end
 
-Scene.get_title = function(self)
-   return self.title
-end
-
-Scene.set_title = function(self, new_title)
-   self.title = new_title
-end
 
 Scene.exists = function(self)
    if self.path ~= nil then
@@ -101,11 +114,5 @@ Scene.save = function(self)
    vim.notify("Created new Excalidraw file: " .. self.path)
 end
 
-
-Scene.set_content = function(self, content)
-   if content then
-      self.content = content
-   end
-end
 
 return Scene

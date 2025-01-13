@@ -4,6 +4,18 @@ local Client = require "excalidraw.client"
 
 local excalidraw = {}
 
+---@type excalidraw.Client|?
+excalidraw._client = nil
+
+
+excalidraw.get_client = function()
+  ---@return excalidraw.Client
+  if excalidraw._client == nil then
+    error "Excalidraw client not set"
+  else
+    return excalidraw._client
+   end
+end
 
 ---@param opts excalidraw.config.ClientOpts
 ---

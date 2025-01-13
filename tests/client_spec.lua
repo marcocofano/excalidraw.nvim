@@ -10,25 +10,25 @@ local Scene = require "excalidraw.scene"
 local default_content = {
     type = "excalidraw",                   -- TODO: type excalidraw only
     version = 2,                           -- TODO: only version 2 available
-    title = "Scene Title",
     source = "https://www.excalidraw.com", -- TODO: only this source fixed for now
     elements = {},
     appState = {
         gridSize = nil,
         viewBackgroundColor = "#aaaaaa"
-    }
+    },
+    files = {}
 }
 
 local template_content = {
     type = "excalidraw",                   -- TODO: type excalidraw only
     version = 2,                           -- TODO: only version 2 available
-    title = "Scene Title",
     source = "https://www.excalidraw.com", -- TODO: only this source fixed for now
     elements = {},
     appState = {
         gridSize = nil,
         viewBackgroundColor = "#bbbbbb"
-    }
+    },
+    files = {}
 }
 
 
@@ -100,13 +100,13 @@ describe("Client module", function()
 
         -- Verify that the scene object is created correctly
         assert.is_not_nil(scene, "Expected Scene object to be created")
-        assert.are.same(expected.title, scene.title, "Expected Scene title to match opts.title")
+        assert.are.same(expected.title, scene.title, "Expected relative path to include parent dirs and .excalidraw")
         assert.are.same(expected.path, scene.path, "Expected relative path to include parent dirs and .excalidraw")
         assert.are.same(expected.content, scene.content, "Scene content does not equal the default")
     end)
     it("create_scene: should create a valid Scene object, with template", function()
         local template = Scene.new(
-            "template_title",
+            "templatetitle",
             "template_filename.excalidraw",
             template_content
         )
@@ -121,7 +121,7 @@ describe("Client module", function()
 
         -- Verify that the scene object is created correctly
         assert.is_not_nil(scene, "Expected Scene object to be created")
-        assert.are.same(expected.title, scene.title, "Expected Scene title to match opts.title")
+        assert.are.same(expected.title, scene.title, "Expected relative path to include parent dirs and .excalidraw")
         assert.are.same(expected.path, scene.path, "Expected relative path to include .excalidraw")
         assert.are.same(expected.content, scene.content, "Scene content dows not equal the template")
     end)
@@ -154,7 +154,6 @@ describe("Client module", function()
         for title, expected_error in pairs(cases) do
             assert.has_error(function()
                 local scene = client:create_scene({ title = title })
-                print("test: ", vim.inspect(scene))
             end, expected_error)
         end
     end)

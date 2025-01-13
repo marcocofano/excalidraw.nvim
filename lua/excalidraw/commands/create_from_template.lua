@@ -34,7 +34,7 @@ picker:find_excalidraw_templates {
       local title = ""
       local dir = ""
 
-      local template = client:load_scene_from_path(template_path)
+      local template = client:create_scene_from_path(template_path)
       local input_string = ""
       if #data > 0 then
          input_string = table.concat(data, " ")
