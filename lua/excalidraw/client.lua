@@ -266,7 +266,6 @@ Client.default_template_content = function()
    return default_content
 end
 
---Get the configured picker or default
 Client.picker = function(self)
    local TelescopePicker = require "excalidraw.pickers"
    return TelescopePicker.new(self)

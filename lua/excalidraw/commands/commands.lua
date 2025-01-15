@@ -34,10 +34,12 @@ end
 local open_link = require "excalidraw.commands.open_link"
 local create = require "excalidraw.commands.create"
 local create_from_template = require "excalidraw.commands.create_from_template"
+local find_scenes = require "excalidraw.commands.find_scenes"
 
 M.register_subcommand("open_link", open_link)
 M.register_subcommand("create", create)
 M.register_subcommand("create_from_template", create_from_template)
+M.register_subcommand("find_scenes", find_scenes)
 
 
 return M

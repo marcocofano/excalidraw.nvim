@@ -110,12 +110,28 @@ TelescopePicker.find_files = function(self, opts)
 end
 
 
--- ---@param opts { prompt_title: string|?, callback: fun(path: string)|?, no_default_mappings: boolean|?}
--- TelescopePicker.find_excalidraw_templates = function(self, opts)
---    local template = Scene.new()
---    template.content = self.client.default_template_content()
---    opts.callback(template)
--- end
+---Find scenes for the configured scenes folder
+---
+---@param opts { prompt_title: string|?, callback: fun(path: string)|?, no_default_mappings: boolean|?}
+TelescopePicker.find_excalidraw_scenes = function(self, opts)
+   self.calling_bufnr = vim.api.nvim_get_current_buf()
+   opts = opts or {}
+
+   local storage_dir = self.client.opts.storage_dir
+
+   if not storage_dir then
+      vim.notify("Excalidraw Scenes directory not found.")
+      return
+   end
+
+   return self:find_files {
+      prompt_title = opts.prompt_title or "Excalidraw Scenes",
+      callback = opts.callback,
+      dir = storage_dir,
+      no_default_mappings = true
+   }
+end
+
 ---Find templates for the configured templates folder
 ---
 ---@param opts { prompt_title: string|?, callback: fun(path: string)|?, no_default_mappings: boolean|?}
