@@ -2,6 +2,7 @@ local telescope         = require "telescope.builtin"
 local telescope_actions = require "telescope.actions"
 local actions_state     = require "telescope.actions.state"
 
+local utils             = require "excalidraw.utils"
 local Scene             = require "excalidraw.scene"
 
 ---@class excalidraw.TelescopePicker
@@ -80,7 +81,6 @@ end
 ---@field prompt_title string|?
 ---@field dir string|?
 ---@field callback fun(path: string)|?
----@field query_mapping excalidraw.PickerMappingsOpts|?
 ---@field selection_mapping excalidraw.PickerMappingsOpts|?
 
 ---@param opts excalidraw.PickerFindOpts|?
@@ -89,7 +89,6 @@ TelescopePicker.find_files = function(self, opts)
 
    local prompt_title = self:_build_prompt {
       prompt_title = opts.prompt_title,
-      query_mappings = opts.query_mappings,
       selection_mappings = opts.selection_mappings,
    }
 
@@ -101,7 +100,6 @@ TelescopePicker.find_files = function(self, opts)
          attach_picker_mappings(map, {
             entry_key = "path",
             callback = opts.callback,
-            query_mappings = opts.query_mappings,
             selection_mappings = opts.selection_mappings,
          })
          return true
@@ -172,7 +170,7 @@ end
 
 --- Build a prompt
 ---
----@param opts { prompt_title: string, query_mappings: excalidraw.PickerMappingTable|?, selection_mapping: excalidraw.PickerMappingTable|?}
+---@param opts { prompt_title: string, selection_mapping: excalidraw.PickerMappingTable|?}
 TelescopePicker._build_prompt = function(self, opts)
    local prompt = opts.prompt_title or "Find"
    if string.len(prompt) > 50 then
@@ -181,7 +179,39 @@ TelescopePicker._build_prompt = function(self, opts)
 
    prompt = prompt .. " | <CR> confirm"
 
-   --TODO: add query and selection mappings
+   --TODO: add selection mappings
+end
+
+
+TelescopePicker.find_scenes_in_buffer = function(self, opts)
+   local pickers = require('telescope.pickers')
+   local finders = require('telescope.finders')
+   local conf = require('telescope.config').values
+
+   local links = utils.search_excalidraw_links(self.calling_bufnr)
+
+   pickers.new({}, {
+      prompt_title = "Excalidraw Links",
+      finder = finders.new_table {
+         results = links,
+         entry_maker = function(entry)
+            return {
+               value = entry.value,
+               display = entry.text .. " -> " .. entry.value,
+               ordinal = entry.text .. " " .. entry.value,
+            }
+         end,
+      },
+      sorter = conf.generic_sorter({}),
+      attach_mappings = function(_, map)
+         map("i", "<CR>", function(prompt_bufnr)
+            local selection = actions_state.get_selected_entry()
+            opts.callback(selection.value)
+            telescope_actions.close(prompt_bufnr)
+         end)
+         return true
+      end,
+   }):find()
 end
 
 return TelescopePicker

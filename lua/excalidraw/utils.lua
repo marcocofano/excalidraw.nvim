@@ -49,4 +49,21 @@ function M.ensure_directory_exists(dir, opts)
    return true
 end
 
+M.search_excalidraw_links = function (bufnr)
+   local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+   local results = {}
+
+   local pattern = "%[(.-)%]%((.-%.excalidraw)%)"
+
+   for _, line in ipairs(lines) do
+      for link_text, file_name in line:gmatch(pattern) do
+         table.insert(results, {
+            text = link_text,
+            value = file_name,
+         })
+      end
+   end
+
+   return results
+end
 return M
