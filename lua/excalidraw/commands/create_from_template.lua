@@ -34,7 +34,7 @@ M.create_excalidraw_file_from_template = function(client, data)
          local title = ""
          local dir = ""
 
-         local template = client:create_scene_from_path(template_path)
+         local template = client:create_scene_from_path("", template_path)
          local input_string = ""
          if #data > 0 then
             input_string = table.concat(data, " ")

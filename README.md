@@ -4,29 +4,35 @@ A nvim plugin to help managing excalidraw diagrams in markdown files.
 
 The plugin is still experimental!
 
-The plugin handles excalidraw links to local files within markdown documents. It stores all files in a sensible way. It
-includes pickers to manage creation and opening of the links with the right app.
+It handles excalidraw links to local files within markdown documents. It stores all files in a sensible way. It includes
+pickers to manage creation and opening of the links with the right app.
 
 It creates default scenes according to your setup configuration. You can also set up some scenes as templates.
 
-
+The plugin is close in spirit to obsidian.nvim and uses a similar albeit greatly simplified structure. In the desktop
+Obsidian app I was using an Excalidraw plugin and it was very handy for keeping my notes and drawings close. Although a
+perfect integration is probably impossible in nvim the basic workflow can be simply reproduced using Excalidraw as an
+installed PWA.
 
 ## Prerequisites
 
 - You need to have the excalidraw app installed as a PWA and configured as default application for .excalidraw files.
-  The plugin provides a cusom opener that tries to find the file in the link in a smarter way, even if you configure it
+  The plugin provides a custom opener that tries to find the file in the link, even if you configure it
   to use relative paths. For the moment only installing it as PWA works. There are plans to make it work in the browser.
 
 ## Features
 
+- Opens links to .excalidraw files in the APP.
 - Create new scenes file (and possibly open it in app). From .md files, give it a name and it creates the scene, a link
   to the file and puts the cursor on the name (at the start). Optionally, it opens the scene with the default app. You
   can configure where to save your scenes.
-- Templates: It can open, save and reuse templates scenes. It Telescope pickers. vim-fzf available in the future.
+- Templates: It can open, save and reuse templates scenes. It uses Telescope pickers. vim-fzf available in the future.
+- Lists all Excalidraw scenes from the default directory in a picker.
+- Lists all links to excalidraw files in the current buffer.
 
 ## Usage
 
-If you want to configure it run the `.setup()` function.
+In order to configure the plugin, run the `.setup()` function.
 
 In Lazy:
 
@@ -50,7 +56,7 @@ opts = {
 }
 ```
 
-Configure the main folder for storage or templates. These folders will be the default ones where the plugin will store
+Configure the main directories for storage or templates. These directories will be the default ones where the plugin will store
 newly created excalidraw files. It will also look for relative path in md links.
 
 ### Open file
@@ -60,7 +66,7 @@ Call `:Excalidraw open` when you are over a link or path with the `.excalidraw` 
 ### Create a new file
 
 Call `:Excalidraw create`. It will prompt for a file name. If a path is provided, it will create all intermediate
-folders. You can also give the filepath as an argument to the command, like: `:Escalidraw create [filepath]`
+directories. You can also give the filepath as an argument to the command, like: `:Escalidraw create [filepath]`
 
 #### Create behaviour
 
@@ -83,7 +89,7 @@ with the template applied to it.
 
 ### List saved scenes
 
-The command `:Excalidraw list` will list all excalidraw files saved to the default directory.
+The command `:Excalidraw find_scenes` will list all excalidraw files saved to the default directory.
 
 ## Command list
 
@@ -91,7 +97,7 @@ The commands that open Pickers default the <CR> keymap to Open. The find_scenes 
 selected scene in the picker. The default keymap is <C-l>, which can be changed in the setup.
 
 | Command                          | Action                                          | Sub Keymap |
-| -------------------------------- | ----------------------------------------------- | ---------- |
+|----------------------------------|-------------------------------------------------|------------|
 | Excalidraw open_link             | Opens a scene from link under cursor            |            |
 | Excalidraw create                | Creates new scene and adds a link               |            |
 | Excalidraw create_from_template  | Creates new scene from template and adds a link |            |
@@ -101,11 +107,9 @@ selected scene in the picker. The default keymap is <C-l>, which can be changed 
 The sub_keymaps are used whenever the corresonding command opens a picker. They can be set calling the setup function
 with the configuration
 
-
 ## Dependencies
 
-The only dependencies are Telescope and Plenary. 
-
+The only dependency is Telescope.
 
 ## Wishlist
 
