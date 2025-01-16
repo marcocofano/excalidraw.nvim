@@ -1,11 +1,17 @@
 local config = {}
 
+---@class Excalidraw.config.PickerOpts
+---
+---@field link_scene_mapping string
+
 ---@class excalidraw.config.ClientOpts
 ---@field storage_dir string
 ---@field templates_dir string
 ---@field open_on_create boolean
 ---@field relative_path boolean
----
+---@field picker Excalidraw.config.PickerOpts
+
+
 config.ClientOpts = {}
 
 
@@ -17,7 +23,10 @@ config.ClientOpts.default = function()
       storage_dir = "~/.excalidraw",
       templates_dir = "~/.excalidraw/templates",
       open_on_create = true,
-      relative_path = true
+      relative_path = true,
+      picker = {
+         link_scene_mapping = "<C-l>"
+      }
    }
 end
 

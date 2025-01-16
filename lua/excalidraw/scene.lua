@@ -59,8 +59,8 @@ Scene.load_content_from_table = function(self, content, overwrite)
    return self
 end
 
-Scene.from_json = function(path, json_content)
-   local scene = Scene.new(path, json_content)
+Scene.from_json = function(title, path, json_content)
+   local scene = Scene.new(title, path, json_content)
    json_content = json_content or '{}'
 
    local decoded_content = vim.fn.json_decode(json_content)

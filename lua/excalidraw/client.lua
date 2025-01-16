@@ -80,7 +80,7 @@ Client.create_scene = function(self, opts)
 end
 
 -- Load Scene from a file
-Client.create_scene_from_path = function(self, filepath)
+Client.create_scene_from_path = function(self, title,  filepath)
    --TODO: verify is_absolute and other client validation
    local file = io.open(filepath, "r")
    if not file then
@@ -88,7 +88,7 @@ Client.create_scene_from_path = function(self, filepath)
    end
    local content = file:read("*a")
    file:close()
-   return Scene.from_json(filepath, content)
+   return Scene.from_json(title, filepath, content)
 end
 
 ---@param scene excalidraw.Scene
