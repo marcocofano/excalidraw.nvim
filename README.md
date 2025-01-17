@@ -17,8 +17,8 @@ installed PWA.
 ## Prerequisites
 
 - You need to have the excalidraw app installed as a PWA and configured as default application for .excalidraw files.
-  The plugin provides a custom opener that tries to find the file in the link, even if you configure it
-  to use relative paths. For the moment only installing it as PWA works. There are plans to make it work in the browser.
+  The plugin provides a custom opener that tries to find the file in the link, even if you configure it to use relative
+  paths. For the moment only installing it as PWA works. There are plans to make it work in the browser.
 
 ## Features
 
@@ -43,6 +43,7 @@ In Lazy:
     end
 }
 ```
+defaults are the following
 
 ```lua
 opts = {
@@ -56,8 +57,8 @@ opts = {
 }
 ```
 
-Configure the main directories for storage or templates. These directories will be the default ones where the plugin will store
-newly created excalidraw files. It will also look for relative path in md links.
+Configure the main directories for storage or templates. These directories will be the default ones where the plugin
+will store newly created excalidraw files. It will also look for relative path in md links.
 
 ### Open file
 
@@ -97,19 +98,23 @@ The commands that open Pickers default the <CR> keymap to Open. The find_scenes 
 selected scene in the picker. The default keymap is <C-l>, which can be changed in the setup.
 
 | Command                          | Action                                          | Sub Keymap |
-|----------------------------------|-------------------------------------------------|------------|
+| -------------------------------- | ----------------------------------------------- | ---------- |
 | Excalidraw open_link             | Opens a scene from link under cursor            |            |
 | Excalidraw create                | Creates new scene and adds a link               |            |
 | Excalidraw create_from_template  | Creates new scene from template and adds a link |            |
 | Excalidraw find_scenes           | Opens a picker with a list of saved scenes      | add_link   |
 | Excalidraw find_scenes_in_buffer | Opens a picker with a list of linked scenes     |            |
 
-The sub_keymaps are used whenever the corresonding command opens a picker. They can be set calling the setup function
+The sub_keymaps are used whenever the corresponding command opens a picker. They can be set calling the setup function
 with the configuration
 
 ## Dependencies
 
 The only dependency is Telescope.
+
+## Not tested
+
+1. Works on Linux, I have not tested it on Mac or Windows. I will move to plenary.path to have more control over filesystem operations
 
 ## Wishlist
 
@@ -124,7 +129,7 @@ This might be fairly simple to implement, I just need to find a way to export th
 This will require the creation of a server. It might be useful to have a state of the currently open excalidraw files
 and get updates live.
 
-### mermaid to excalidraw and vv
+### Mermaid to excalidraw and viceversa
 
 I feel that this is easier if I can tap into the ExcalidrawAPI directly.
 

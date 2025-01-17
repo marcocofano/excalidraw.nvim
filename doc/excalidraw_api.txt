@@ -1,0 +1,116 @@
+------------------------------------------------------------------------------
+Excalidraw.nvim. Lua API Documentation
+
+=============================================================================
+
+Table of Contents
+
+  excalidraw.Client........................................|excalidraw.Client|
+  excalidraw.Scene..........................................................
+  
+------------------------------------------------------------------------------
+                                                           *excalidraw.Client*
+                                    `Client`
+The Client class, a main store for setup options and main api.
+
+The Excalidraw.nvim plugin manages your scenes in md files. It keeps organized and linked all your drawings in your note-taking vault. If using Obsidian, this should remind you of the Excalidraw plugin there. For this reason this plugin is directly inspired by Obsidian.nvim as it is clear from the following client class (although in a simplified fashion) 
+
+Reference: https://github.com/epwalsh/obsidian.nvim for the original obsidian.nvim work.
+
+Class ~
+{excalidraw.Client}
+Fields ~
+{opts} excalidraw.config.ClientOpts
+
+------------------------------------------------------------------------------
+Class ~
+{excalidraw.CreateSceneOpts}
+Fields ~
+{title} `(string)`
+{dir} `(string)`
+{template} excalidraw.Scene|?
+
+------------------------------------------------------------------------------
+                                            *excalidraw.Client.create_scene()*
+                     `Client.create_scene`({self}, {opts})
+Create a new scene object
+
+This is a builder method to create the scenes from just a title
+
+Parameters ~
+{opts} excalidraw.CreateSceneOpts Options
+
+Create scene builder from the user input or input argument
+set filename with extension
+expand to absolute according to configs or input path
+save separately the relative path, it might be used for the md link
+@return excalidraw.Scene
+
+------------------------------------------------------------------------------
+                                              *excalidraw.Client.save_scene()*
+                      `Client.save_scene`({self}, {scene})
+Parameters ~
+{scene} excalidraw.Scene
+
+------------------------------------------------------------------------------
+                                         *excalidraw.Client.open_scene_link()*
+                    `Client.open_scene_link`({self}, {link})
+a Scene object from a link
+
+Parameters ~
+{self} excalidraw.Client
+{link} `(string)`
+
+------------------------------------------------------------------------------
+                                           *excalidraw.Client.relative_path()*
+                 `Client.relative_path`({self}, {path}, {opts})
+Make a path relative to the storage_dir
+
+Parameters ~
+{path} `(string)`
+{opts} { strict: `(boolean|?)` }|?
+
+Return ~
+`(string|)` `(optional)`
+
+------------------------------------------------------------------------------
+                                     *excalidraw.Client.build_markdown_link()*
+                 `Client.build_markdown_link`({self}, {scene})
+Parameters ~
+{scene} excalidraw.Scene
+Return ~
+`(string|nil)`
+
+------------------------------------------------------------------------------
+Class ~
+{excalidraw.SceneContent}
+
+Fields ~
+{type} `(string)`
+{version} `(integer)`
+{source} `(string)`
+{elements} `(table)`
+{appState} `(table)`
+{files} `(table)`
+
+------------------------------------------------------------------------------
+                                                            *excalidraw.Scene*
+                                    `Scene`
+A class to abstract an Excalidraw scene (json) file. This is the common way excalidraw stores scenes locally.
+The scene is a representation of the excalidraw file, its link and metadata
+
+
+Class ~
+{excalidraw.Scene}
+Fields ~
+{title} `(string)`
+{path} `(string)`
+{content} excalidraw.SceneContent|?
+
+------------------------------------------------------------------------------
+                                                 *excalidraw.Scene.filename()*
+                            `Scene.filename`({self})
+Return ~
+`(string|)` `(optional)`
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

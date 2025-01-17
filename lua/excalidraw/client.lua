@@ -1,17 +1,27 @@
---- Client class, a main store for setup options and main api.
---- Directly inspired by Obsidian.nvim CLient class approach, it shares, (although in a simplified version,
---- many of its features). Hopefully this will enable to integrate directly into Obsidian.nvim in the future
---- Reference: https://github.com/epwalsh/obsidian.nvim for the original work.
-
+--- Excalidraw.nvim. Lua API Documentation
+---
+--- =============================================================================
+---
+--- Table of Contents
+---
+---@toc
 
 local path_handler = require "excalidraw.path_handler"
 local utils        = require "excalidraw.utils"
 local Scene        = require "excalidraw.scene"
 
+
+--- The Client class, a main store for setup options and main api.
+---
+--- The Excalidraw.nvim plugin manages your scenes in md files. It keeps organized and linked all your drawings in your note-taking vault. If using Obsidian, this should remind you of the Excalidraw plugin there. For this reason this plugin is directly inspired by Obsidian.nvim as it is clear from the following client class (although in a simplified fashion) 
+---
+--- Reference: https://github.com/epwalsh/obsidian.nvim for the original obsidian.nvim work.
+---
+---@toc_entry excalidraw.Client
 ---@class excalidraw.Client
 ---@field opts excalidraw.config.ClientOpts
-local Client       = {}
-Client.__index     = Client
+local Client   = {}
+Client.__index = Client
 
 
 Client.new = function(opts)
@@ -26,8 +36,6 @@ end
 ---@field title string
 ---@field dir string
 ---@field template excalidraw.Scene|?
-
-
 
 
 --- Create a new scene object
@@ -80,7 +88,7 @@ Client.create_scene = function(self, opts)
 end
 
 -- Load Scene from a file
-Client.create_scene_from_path = function(self, title,  filepath)
+Client.create_scene_from_path = function(self, title, filepath)
    --TODO: verify is_absolute and other client validation
    local file = io.open(filepath, "r")
    if not file then
@@ -102,52 +110,6 @@ Client.save_scene = function(self, scene)
    utils.ensure_directory_exists(vim.fn.fnamemodify(absolute_path, ":h"))
    scene:save()
 end
-
--- Client.clone_scene = function(self, title, path, scene)
---    if scene == nil or scene.content == nil then --TODO: make a is_valid method?
---       vim.notify("Cannot clone. Provide a valid scene.")
---       return
---    end
---    title = title or scene.title .. "(Copy)"
---    if not path or path == "" then
---       local dirname = vim.fn.fnamemodify(scene.path, ":h")
---       local filename = vim.fn.fnamemodify(scene.path, ":t:r")
---       local extension = vim.fn.fnamemodify(scene.path, ":e")
---
---       -- Construct the new filepath
---       local new_filename = filename .. "_copy" .. "." .. extension
---       local new_filepath = vim.fs.joinpath(dirname, new_filename)
---
---       path = new_filepath
---    else
---       path = path_handler.expand_to_absolute(path, self.opts.storage_dir)
---    end
---    return Scene.new(path, scene.content)
--- end
-
--- ---Create a scene object from a link
--- ---
--- ---@param self excalidraw.Client
--- ---@param link string
--- ---
--- ---@return excalidraw.Scene
--- Client.get_scene_from_link = function(self, link)
---    return Scene.new(link)
--- end
-
--- Client.open_scene = function(self, scene)
---    local scene_json = scene:to_json()
---    local url = "https://excalidraw.com/#json=" .. vim.fn.escape(scene_json, " ")
---
---    local cmd = ""
---    if self.opts.open_as_pwa then
---       cmd = "/opt/google/chrome/google-chrome  --app=" .. url
---       vim.fn.escape(scene_json, " ")
---    else
---       cmd = "xdg-open --app=" .. url -- Adjust for your OS
---    end
---    os.execute(cmd)
--- end
 
 
 ---Open a Scene object from a link

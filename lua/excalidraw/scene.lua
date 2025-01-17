@@ -1,6 +1,4 @@
----The following classes are a first try at abstract the content and notion of scenes in Excalidraw.
----For now there is nothing more that can be done with the plugin apart from handling .md files and excalidraw relationship.
----
+---@toc_entry excalidraw.Scene
 ---
 ---@class excalidraw.SceneContent
 ---
@@ -12,9 +10,11 @@
 ---@field files table
 
 
----@class excalidraw.Scene
+--- A class to abstract an Excalidraw scene (json) file. This is the common way excalidraw stores scenes locally.
 --- The scene is a representation of the excalidraw file, its link and metadata
 ---
+---
+---@class excalidraw.Scene
 ---@field title string
 ---@field path string
 ---@field content excalidraw.SceneContent|?
