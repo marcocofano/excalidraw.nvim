@@ -13,7 +13,7 @@ Table of Contents
                                     `Client`
 The Client class, a main store for setup options and main api.
 
-The Excalidraw.nvim plugin manages your scenes in md files. It keeps organized and linked all your drawings in your note-taking vault. If using Obsidian, this should remind you of the Excalidraw plugin there. For this reason this plugin is directly inspired by Obsidian.nvim as it is clear from the following client class (although in a simplified fashion) 
+The Excalidraw.nvim plugin manages your scenes in md files. It keeps organized and linked all your drawings in your note-taking vault. If using Obsidian, this should remind you of the Excalidraw plugin there. For this reason this plugin is directly inspired by Obsidian.nvim as it is clear from the following client class (although in a simplified fashion)
 
 Reference: https://github.com/epwalsh/obsidian.nvim for the original obsidian.nvim work.
 
@@ -76,10 +76,20 @@ Return ~
 ------------------------------------------------------------------------------
                                      *excalidraw.Client.build_markdown_link()*
                  `Client.build_markdown_link`({self}, {scene})
+Build the links string in Markdown format, from the scene data: title and path.
 Parameters ~
 {scene} excalidraw.Scene
 Return ~
 `(string|nil)`
+
+------------------------------------------------------------------------------
+                                            *excalidraw.Client.resolve_path()*
+                     `Client.resolve_path`({self}, {input})
+the absolute path to the file, with various options. If storage_dir is given and the path is relative, resolve from there.
+Parameters ~
+{input} `(string)` The link to construct the path for.
+Return ~
+`(string)`  The constructed absolute path.
 
 ------------------------------------------------------------------------------
 Class ~

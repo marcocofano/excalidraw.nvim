@@ -6,14 +6,13 @@
 ---
 ---@toc
 
-local path_handler = require "excalidraw.path_handler"
 local utils        = require "excalidraw.utils"
 local Scene        = require "excalidraw.scene"
 
 
 --- The Client class, a main store for setup options and main api.
 ---
---- The Excalidraw.nvim plugin manages your scenes in md files. It keeps organized and linked all your drawings in your note-taking vault. If using Obsidian, this should remind you of the Excalidraw plugin there. For this reason this plugin is directly inspired by Obsidian.nvim as it is clear from the following client class (although in a simplified fashion) 
+--- The Excalidraw.nvim plugin manages your scenes in md files. It keeps organized and linked all your drawings in your note-taking vault. If using Obsidian, this should remind you of the Excalidraw plugin there. For this reason this plugin is directly inspired by Obsidian.nvim as it is clear from the following client class (although in a simplified fashion)
 ---
 --- Reference: https://github.com/epwalsh/obsidian.nvim for the original obsidian.nvim work.
 ---
@@ -65,7 +64,7 @@ Client.create_scene = function(self, opts)
       relative_path = filename
    end
 
-   local absolute_path = path_handler.expand_to_absolute(relative_path, self.opts.storage_dir)
+   local absolute_path = self:resolve_path(relative_path)
    if vim.fn.filereadable(absolute_path) == 1 then
       vim.notify("File already exists: " .. absolute_path, vim.log.levels.ERROR)
       error("Client.create_scene error: File already exists")
@@ -82,14 +81,16 @@ Client.create_scene = function(self, opts)
    if not opts.template then
       new_scene:load_content_from_table(self.default_template_content())
    else
-      new_scene:load_content_from_table(opts.template.content) --TODO: to be adjusted.. including better validation for content, like it is done in load_from_json
+      new_scene:load_content_from_table(opts.template.content)
    end
    return new_scene
 end
 
 -- Load Scene from a file
 Client.create_scene_from_path = function(self, title, filepath)
-   --TODO: verify is_absolute and other client validation
+   --TODO: add scene content validation like a is_valid method
+   --
+   filepath = self:resolve_path(filepath)
    local file = io.open(filepath, "r")
    if not file then
       error("Could not open file: " .. filepath)
@@ -105,7 +106,7 @@ Client.save_scene = function(self, scene)
       error("No scene to be saved")
    end
 
-   local absolute_path = path_handler.expand_to_absolute(scene.path, self.opts.storage_dir)
+   local absolute_path = self:resolve_path(scene.path)
    scene.path = absolute_path
    utils.ensure_directory_exists(vim.fn.fnamemodify(absolute_path, ":h"))
    scene:save()
@@ -120,7 +121,7 @@ Client.open_scene_link = function(self, link)
    -- Check if the link ends with .excalidraw
    if string.match(link, '%.excalidraw$') then
       -- contruct path from the input
-      local filepath = path_handler.expand_to_absolute(link, self.opts.storage_dir)
+      local filepath = self:resolve_path(link)
       if vim.fn.filereadable(filepath) ~= 1 or filepath == nil then
          vim.notify("File not found: " .. filepath, vim.log.levels.ERROR)
          return
@@ -191,11 +192,11 @@ Client.relative_path = function(self, path, opts)
    elseif not is_absolute(path) then
       return path
    elseif opts.strict then
-      error(string.format("failed to resolve '%s' relative to root '%s'", path, self.opts.storage_dir))
+      error(string.format("failed to resolve '%s' relative to storage_dir '%s'", path, self.opts.storage_dir))
    end
 end
 
-
+--- Build the links string in Markdown format, from the scene data: title and path.
 ---@param scene excalidraw.Scene
 ---@return string|nil
 Client.build_markdown_link = function(self, scene)
@@ -211,6 +212,34 @@ Client.build_markdown_link = function(self, scene)
       markdown_link = "[" .. scene.title .. "](" .. scene.path .. ")"
    end
    return markdown_link
+end
+
+---Construct the absolute path to the file, with various options. If storage_dir is given and the path is relative, resolve from there.
+---@param input string The link to construct the path for.
+---@return string  The constructed absolute path.
+Client.resolve_path = function(self, input)
+   if not input then
+      error("input path is mandatory to be expanded")
+   end
+
+   -- 1. Absolute input, return as-is
+   if input:sub(1, 1) == "/" then
+      return input
+   end
+
+   -- 2. Input path starting with "./" or similar, expand relative to CWD
+   if input:sub(1, 2) == "./" then
+      return vim.fn.getcwd() .. "/" .. input:sub(3)
+   end
+
+   -- 3. input starting with "~", expand to home directory
+   if input:sub(1, 1) == "~" then
+      local home = vim.fn.expand("~")
+      return home .. input:sub(2)
+   end
+
+   -- 4. Default case: Expand relative to storage_dir
+   return vim.fs.joinpath(vim.fn.fnamemodify(self.opts.storage_dir, ":p"), input)
 end
 
 Client.default_template_content = function()

@@ -4,15 +4,19 @@ A nvim plugin to help managing excalidraw diagrams in markdown files.
 
 The plugin is still experimental!
 
-It handles excalidraw links to local files within markdown documents. It stores all files in a sensible way. It includes
-pickers to manage creation and opening of the links with the right app.
+- Handle excalidraw links to local files within markdown documents
+- Store all files in default folders
+- Use pickers to manage creation and opening of the links with the right app.
+- Store and use Templates and default Excalidraw scenes for your next drawings
 
-It creates default scenes according to your setup configuration. You can also set up some scenes as templates.
+The idea came from the integrtion of Excalidraw and Obsidian in the desktop Obsidian app. The Excalidraw plugin helped
+keeping my notes and drawings close. I moved to Obsidian.nvim a few months ago and I was missing this feature. For this
+reason **excalidraw.nvim** is close in spirit to obsidian.nvim and uses a similar albeit greatly simplified structure.
+Although a perfect integration is probably impossible in nvim, the basic workflow can be reproduced using Excalidraw as
+an installed PWA, which is possible using Chrome as browser.
 
-The plugin is close in spirit to obsidian.nvim and uses a similar albeit greatly simplified structure. In the desktop
-Obsidian app I was using an Excalidraw plugin and it was very handy for keeping my notes and drawings close. Although a
-perfect integration is probably impossible in nvim the basic workflow can be simply reproduced using Excalidraw as an
-installed PWA.
+> [!NOTE] I have tried to make it work with non-installed Excalidraw PWA, i.e. diretly in the browser, but the
+> development is still on-going
 
 ## Prerequisites
 
@@ -23,7 +27,7 @@ installed PWA.
 ## Features
 
 - Opens links to .excalidraw files in the APP.
-- Create new scenes file (and possibly open it in app). From .md files, give it a name and it creates the scene, a link
+- Create new scene json file, give it a name and it creates the scene, a link
   to the file and puts the cursor on the name (at the start). Optionally, it opens the scene with the default app. You
   can configure where to save your scenes.
 - Templates: It can open, save and reuse templates scenes. It uses Telescope pickers. vim-fzf available in the future.
@@ -43,6 +47,7 @@ In Lazy:
     end
 }
 ```
+
 defaults are the following
 
 ```lua
@@ -85,7 +90,7 @@ directories. You can also give the filepath as an argument to the command, like:
 
 Call `:Excalidraw create_from_template` will open a picker with the templates stored in the configured directory.
 
-<CR> is mapped to prompt the user to select the name for the new file. It will create a new excalidraw file (and link)
+`<CR>` is mapped to prompt the user to select the name for the new file. It will create a new excalidraw file (and link)
 with the template applied to it.
 
 ### List saved scenes
@@ -114,7 +119,8 @@ The only dependency is Telescope.
 
 ## Not tested
 
-1. Works on Linux, I have not tested it on Mac or Windows. I will move to plenary.path to have more control over filesystem operations
+1. Works on Linux, I have not tested it on Mac or Windows. I will move to plenary.path to have more control over
+   filesystem operations
 
 ## Wishlist
 
