@@ -4,12 +4,17 @@ A nvim plugin to help managing excalidraw diagrams in markdown files.
 
 The plugin is still experimental!
 
-- Handle excalidraw links to local files within markdown documents
-- Store all files in default folders
-- Use pickers to manage creation and opening of the links with the right app.
-- Store and use Templates and default Excalidraw scenes for your next drawings
+## Main Features
 
-The idea came from the integrtion of Excalidraw and Obsidian in the desktop Obsidian app. The Excalidraw plugin helped
+- Opens links to .excalidraw files in the Excalidraw APP.
+- Create new scene json file, give it a name and it creates the scene, a link
+  to the file and puts the cursor on the name (at the start). Optionally, it opens the scene with the default app. You
+  can configure where to save your scenes.
+- Templates: It can open, save and reuse templates scenes. It uses Telescope pickers. vim-fzf available in the future.
+- Lists all Excalidraw scenes from the default directory in a picker.
+- Lists all links to excalidraw files in the current buffer.
+
+The idea came from the integration of Excalidraw and Obsidian in the desktop Obsidian app. The Excalidraw plugin helped
 keeping my notes and drawings close. I moved to Obsidian.nvim a few months ago and I was missing this feature. For this
 reason **excalidraw.nvim** is close in spirit to obsidian.nvim and uses a similar albeit greatly simplified structure.
 Although a perfect integration is probably impossible in nvim, the basic workflow can be reproduced using Excalidraw as
@@ -24,15 +29,6 @@ an installed PWA, which is possible using Chrome as browser.
   The plugin provides a custom opener that tries to find the file in the link, even if you configure it to use relative
   paths. For the moment only installing it as PWA works. There are plans to make it work in the browser.
 
-## Features
-
-- Opens links to .excalidraw files in the APP.
-- Create new scene json file, give it a name and it creates the scene, a link
-  to the file and puts the cursor on the name (at the start). Optionally, it opens the scene with the default app. You
-  can configure where to save your scenes.
-- Templates: It can open, save and reuse templates scenes. It uses Telescope pickers. vim-fzf available in the future.
-- Lists all Excalidraw scenes from the default directory in a picker.
-- Lists all links to excalidraw files in the current buffer.
 
 ## Usage
 
