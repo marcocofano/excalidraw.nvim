@@ -1,7 +1,9 @@
 excalidraw.Client	excalidraw_api.txt	/*excalidraw.Client*
 excalidraw.Client.build_markdown_link()	excalidraw_api.txt	/*excalidraw.Client.build_markdown_link()*
 excalidraw.Client.create_scene()	excalidraw_api.txt	/*excalidraw.Client.create_scene()*
+excalidraw.Client.default_template_content()	excalidraw_api.txt	/*excalidraw.Client.default_template_content()*
 excalidraw.Client.open_scene_link()	excalidraw_api.txt	/*excalidraw.Client.open_scene_link()*
+excalidraw.Client.picker()	excalidraw_api.txt	/*excalidraw.Client.picker()*
 excalidraw.Client.relative_path()	excalidraw_api.txt	/*excalidraw.Client.relative_path()*
 excalidraw.Client.resolve_path()	excalidraw_api.txt	/*excalidraw.Client.resolve_path()*
 excalidraw.Client.save_scene()	excalidraw_api.txt	/*excalidraw.Client.save_scene()*

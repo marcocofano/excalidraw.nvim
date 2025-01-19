@@ -90,16 +90,13 @@ end
 
 
 ---@class Excalidraw.LinkSceneMapping : Excalidraw.AltMapping
-
-
 ---@return Excalidraw.LinkSceneMapping
 TelescopePicker._build_link_scene_mapping = function(self)
    ---@type Excalidraw.LinkSceneMapping
-   local mapping = {}
-   mapping =  {
+   local mapping = {
       key = self.client.opts.picker.link_scene_mapping,
       description = "insert link",
-      callback = function (path)
+      callback = function(path)
          local scene = self.client:create_scene_from_path("", path)
 
          local link = self.client:build_markdown_link(scene)
@@ -120,7 +117,7 @@ end
 ---@field prompt_title string|?
 ---@field dir string|?
 ---@field callback fun(path: string)|?
----@field alt_mappings Excalidraw.AltMapping[]
+---@field alt_mappings Excalidraw.AltMapping[]|?
 
 ---@param opts excalidraw.PickerFindOpts|?
 TelescopePicker.find_files = function(self, opts)
@@ -160,7 +157,6 @@ TelescopePicker.find_excalidraw_scenes = function(self, opts)
       vim.notify("Excalidraw Scenes directory not found.")
       return
    end
-   -- print("test: ", vim.inspect(self:_build_link_scene_mapping()))
    return self:find_files {
       prompt_title = opts.prompt_title or "Excalidraw Scenes",
       callback = opts.callback,
@@ -215,6 +211,7 @@ TelescopePicker.find_scenes_in_buffer = function(self, opts)
       attach_mappings = function(_, map)
          map("i", "<CR>", function(prompt_bufnr)
             local selection = actions_state.get_selected_entry()
+            print(selection.value)
             opts.callback(selection.value)
             telescope_actions.close(prompt_bufnr)
          end)

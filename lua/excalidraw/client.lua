@@ -1,20 +1,25 @@
 --- Excalidraw.nvim. Lua API Documentation
 ---
---- =============================================================================
+--- ============================================================================
 ---
 --- Table of Contents
 ---
 ---@toc
 
-local utils        = require "excalidraw.utils"
-local Scene        = require "excalidraw.scene"
+local utils = require "excalidraw.utils"
+local Scene = require "excalidraw.scene"
 
 
 --- The Client class, a main store for setup options and main api.
 ---
---- The Excalidraw.nvim plugin manages your scenes in md files. It keeps organized and linked all your drawings in your note-taking vault. If using Obsidian, this should remind you of the Excalidraw plugin there. For this reason this plugin is directly inspired by Obsidian.nvim as it is clear from the following client class (although in a simplified fashion)
+--- The Excalidraw.nvim plugin manages your scenes in md files. It keeps
+--- organized and linked all your drawings in your note-taking vault. If using
+--- Obsidian, this should remind you of the Excalidraw plugin there. For this 
+--- reason this plugin is directly inspired by Obsidian.nvim as it is clear from
+--- the following client class (although in a simplified fashion)
 ---
---- Reference: https://github.com/epwalsh/obsidian.nvim for the original obsidian.nvim work.
+--- Reference: https://github.com/epwalsh/obsidian.nvim for the original 
+--- obsidian.nvim work.
 ---
 ---@toc_entry excalidraw.Client
 ---@class excalidraw.Client
@@ -113,7 +118,7 @@ Client.save_scene = function(self, scene)
 end
 
 
----Open a Scene object from a link
+--- Open a Scene object from a link
 ---
 ---@param self excalidraw.Client
 ---@param link string
@@ -196,7 +201,8 @@ Client.relative_path = function(self, path, opts)
    end
 end
 
---- Build the links string in Markdown format, from the scene data: title and path.
+--- Build the links string in Markdown format, from the scene data: title and 
+--- path.
 ---@param scene excalidraw.Scene
 ---@return string|nil
 Client.build_markdown_link = function(self, scene)
@@ -214,7 +220,8 @@ Client.build_markdown_link = function(self, scene)
    return markdown_link
 end
 
----Construct the absolute path to the file, with various options. If storage_dir is given and the path is relative, resolve from there.
+--- Construct the absolute path to the file, with various options. 
+--- If storage_dir is given and the path is relative, resolve from there.
 ---@param input string The link to construct the path for.
 ---@return string  The constructed absolute path.
 Client.resolve_path = function(self, input)
@@ -242,6 +249,7 @@ Client.resolve_path = function(self, input)
    return vim.fs.joinpath(vim.fn.fnamemodify(self.opts.storage_dir, ":p"), input)
 end
 
+--- The default content used to create new Scenes
 Client.default_template_content = function()
    local default_content = {
       type = "excalidraw",                   -- TODO: type excalidraw only
@@ -257,6 +265,7 @@ Client.default_template_content = function()
    return default_content
 end
 
+--- Get a new Telescope Picker and load the Client reference to it 
 Client.picker = function(self)
    local TelescopePicker = require "excalidraw.pickers"
    return TelescopePicker.new(self)
