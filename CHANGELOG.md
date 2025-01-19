@@ -5,6 +5,9 @@ This repository follows [Keep a ChangeLog](https://keepachangelog.com/en/1.0.0/)
 
 ## Unreleased
 
+## [v0.1.0](https://github.com/marcocofano/excalidraw/excalidraw.nvim/releases/tag/v0.1.0) - 2025-01-20
+
+
 Added
 
 - Initial repo for plugin
