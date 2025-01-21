@@ -20,6 +20,10 @@ reason **excalidraw.nvim** is close in spirit to obsidian.nvim and uses a simila
 Although a perfect integration is probably impossible in nvim, the basic workflow can be reproduced using Excalidraw as
 an installed PWA, which is possible using Chrome as browser.
 
+## Video Showcase
+
+https://github.com/user-attachments/assets/72d6afc3-42df-4cb0-9bec-c6003abace7b
+
 > [!NOTE] I have tried to make it work with non-installed Excalidraw PWA, i.e. diretly in the browser, but the
 > development is still on-going
 
